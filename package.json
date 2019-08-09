@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node scripts/startServer.js",
-    "build": "npm i",
+    "build": "npm i && node scripts/startServer.js",
     "dev": "nodemon scripts/startServer.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
