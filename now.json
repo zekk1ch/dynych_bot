@@ -4,6 +4,10 @@
     {
       "src": "src/*.js",
       "use": "@now/node"
+    },
+    {
+      "src": "scripts/startServer.js",
+      "use": "@now/node"
     }
   ],
   "env": {
