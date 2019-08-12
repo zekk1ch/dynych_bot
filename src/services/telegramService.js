@@ -2,26 +2,6 @@ const memeService = require('./imageService');
 const util = require('./utilService');
 const constants = require('../constants');
 
-const getRandomMemeUrl = () => memeService.getRandomMemeUrl();
-
-const sendMessage = async (text = '¯\\_(ツ)_/¯') => {
-    console.log('\n\n::: Start sending back a message :::\n\n');
-    const body = {
-        // chat_id: message.chat.id,
-        chat_id: 364204785,
-        text: '¯\\_(ツ)_/¯',
-    };
-    try {
-        const data = await util.makeRequest(constants.telegramUrl + '/sendMessage', 'POST', body);
-
-        console.log('\n\n::: A message back was sent! :::\n\n');
-        console.log(data);
-    } catch (err) {
-        console.log('\n\n::: Failed to send a message back :::\n\n');
-        console.log(err);
-    }
-};
-
 const parseCommand = (body) => {
     try {
         return body.message.text.trim();
@@ -31,8 +11,26 @@ const parseCommand = (body) => {
     }
 };
 
+const sendText = async (chat_id, text = '¯\\_(ツ)_/¯') => {
+    try {
+        await util.makeRequest(constants.telegramUrl + '/sendMessage', 'POST', { chat_id, text });
+    } catch (err) {
+        console.log(err);
+    }
+};
+
+const sendRandomMeme = async (chat_id) => {
+    try {
+        const photo = await memeService.getRandomMemeUrl();
+        await util.makeRequest(constants.telegramUrl + '/sendPhoto', 'POST', { chat_id, photo });
+    } catch (err) {
+        console.log(err);
+        sendText('Нимагу найти ничего смешного, сорян братик :heart:');
+    }
+};
+
 module.exports = {
     parseCommand,
-    getRandomMemeUrl,
-    sendMessage,
+    sendRandomMeme,
+    sendText,
 };

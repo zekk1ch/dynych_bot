@@ -8,14 +8,14 @@ router.post('/', async (req, res) => {
 
         switch (message) {
             case '/meme':
-                const memeUrl = await telegramService.getRandomMemeUrl();
-                return res.status(301).redirect(memeUrl);
+                await telegramService.sendRandomMeme();
+                break;
             case '/joke':
             case '/test':
-                await telegramService.sendMessage();
-                return res.send('ok');
+                await telegramService.sendText();
+                break;
             default:
-                return res.status(400).send('Me no understand what say you...');
+                res.status(400).send('Me no understand what say you...');
         }
     } catch (err) {
         console.error(err);
