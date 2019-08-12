@@ -15,6 +15,7 @@ router.post('/', async (req, res) => {
                 return res.status(301).redirect(memeUrl);
             case '/joke':
             case '/test':
+                console.log('\n\n/test ROUTE\n\n');
                 await telegramService.sendMessage();
                 return res.send('ok');
         }
