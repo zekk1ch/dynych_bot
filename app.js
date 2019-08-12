@@ -9,4 +9,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use('/', router);
 
+app.get('/start_bot', (req, res) => {
+    res.send('Hi');
+});
+
 module.exports = app;
