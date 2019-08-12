@@ -9,7 +9,7 @@ const parse = (body) => {
             message: body.message.text.trim(),
         };
     } catch (err) {
-        console.log(err);
+        console.error(err);
         throw new Error('Failed to parse command from message body');
     }
 };
@@ -18,7 +18,7 @@ const sendText = async (chat_id, text = '¯\\_(ツ)_/¯') => {
     try {
         await util.makeRequest(constants.telegramUrl + '/sendMessage', 'POST', { chat_id, text });
     } catch (err) {
-        console.log(err);
+        console.error(err);
     }
 };
 
@@ -27,7 +27,7 @@ const sendRandomMeme = async (chat_id) => {
         const photo = await memeService.getRandomMemeUrl();
         await util.makeRequest(constants.telegramUrl + '/sendPhoto', 'POST', { chat_id, photo });
     } catch (err) {
-        console.log(err);
+        console.error(err);
         sendText('Нимагу найти ничего смешного, сорян братик :heart:');
     }
 };

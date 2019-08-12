@@ -2,6 +2,14 @@ const express = require('express');
 const telegramService = require('./services/telegramService');
 const router = express.Router();
 
+router.use((req, res, next) => {
+    if (Object.entries(req.body).length) {
+        next();
+    }
+
+    res.send('ok');
+});
+
 router.post('/', async (req, res) => {
     try {
         const { message, chatId } = telegramService.parse(req.body);
