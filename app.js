@@ -10,6 +10,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/', router);
 
 app.get('/', (req, res) => {
+    console.log(req.method);
+    console.log(req.methodName);
     res.send('This is get');
 });
 app.post('/', (req, res) => {
