@@ -1,6 +1,14 @@
 {
   "version": 2,
   "builds": [
+    {
+      "src": "api/scr/**.js",
+      "use": "@now/node"
+    },
+    {
+      "src": "api/app.js",
+      "use": "@now/node"
+    }
   ],
   "env": {
     "TELEGRAM_SERVER_URL": "https://api.telegram.org/bot",
