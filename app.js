@@ -12,10 +12,9 @@ app.use('/', router);
 app.post('/', (req, res) => {
     res.send('This is POST');
 });
-app.get('/', (req, res) => {
+app.use('/*', (req, res, next) => {
     console.log(req.method);
-    console.log(req.methodName);
-    res.send('This is get');
+    next();
 });
 
 module.exports = app;

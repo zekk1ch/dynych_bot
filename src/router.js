@@ -3,7 +3,7 @@ const constants = require('./constants');
 const telegramService = require('./services/telegramService');
 const router = express.Router();
 
-router.post('/start_bot', async (req, res) => {
+router.post('/', async (req, res) => {
     let { message } = req.body;
     if (typeof message === 'string') {
         message = message.trim();
