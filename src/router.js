@@ -1,5 +1,4 @@
 const express = require('express');
-const constants = require('./constants');
 const telegramService = require('./services/telegramService');
 const router = express.Router();
 
@@ -18,10 +17,12 @@ router.post('/', async (req, res) => {
         }
     } catch (err) {
         console.error(err);
-        return res.status(500).send('Opps... I dare you to try again');
+        return res.status(500).send('Opps... Try again');
     }
 
-    res.status(404).send('Me no understand what say you...');
+    res.status(400).send('Me no understand what say you...');
 });
+
+router.use('/*', (req, res) => res.status(404).send(`Route "${req.method} ${req.originalUrl}" is not supported`));
 
 module.exports = router;

@@ -1,0 +1,4 @@
+{
+  "create": "curl -F \"url=https://<PATH_TO_BOT_API>\" https://api.telegram.org/bot<BOT_TOKEN>/setWebhook",
+  "delete": "curl -F \"url=https://<PATH_TO_BOT_API>\" https://api.telegram.org/bot<BOT_TOKEN>/deleteWebhook"
+}

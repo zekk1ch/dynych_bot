@@ -1,5 +1,5 @@
 module.exports = {
-    telegramUrl: process.env.TELEGRAM_SERVER_URL + process.env.TELEGRAM_API_TOKEN,
-    memeUrlsUrl: process.env.MEMES_SERVER_URL + process.env.MEMES_PATH,
-    memeUrl: process.env.MEMES_SERVER_URL + process.env.MEME_PATH,
+    telegramUrl: process.env.TELEGRAM_BOT_URL || 'http://example.com/fake-bot',
+    memeUrlsUrl: process.env.MEME_SERVER_URL || 'http://example.com' + process.env.MEME_URLS_PATH || '/meme-urls-path',
+    memeUrl: process.env.MEMES_SERVER || 'http://example.com' + process.env.MEME_PATH || '/meme-path',
 };
