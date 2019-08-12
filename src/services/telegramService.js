@@ -2,9 +2,12 @@ const memeService = require('./imageService');
 const util = require('./utilService');
 const constants = require('../constants');
 
-const parseCommand = (body) => {
+const parse = (body) => {
     try {
-        return body.message.text.trim();
+        return {
+            chatId: body.message.chat.id,
+            message: body.message.text.trim(),
+        };
     } catch (err) {
         console.log(err);
         throw new Error('Failed to parse command from message body');
@@ -30,7 +33,7 @@ const sendRandomMeme = async (chat_id) => {
 };
 
 module.exports = {
-    parseCommand,
+    parse,
     sendRandomMeme,
     sendText,
 };

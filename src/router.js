@@ -4,15 +4,15 @@ const router = express.Router();
 
 router.post('/', async (req, res) => {
     try {
-        const message = telegramService.parseCommand(req.body);
+        const { message, chatId } = telegramService.parse(req.body);
 
         switch (message) {
             case '/meme':
-                await telegramService.sendRandomMeme();
+                await telegramService.sendRandomMeme(chatId);
                 break;
             case '/joke':
             case '/test':
-                await telegramService.sendText();
+                await telegramService.sendText(chatId);
                 break;
             default:
                 res.status(400).send('Me no understand what say you...');
