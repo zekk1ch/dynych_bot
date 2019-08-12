@@ -9,8 +9,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use('/', router);
 
-app.get('/start_bot', (req, res) => {
-    res.send('Hi');
+app.get('/', (req, res) => {
+    res.send('This is get');
+});
+app.post('/', (req, res) => {
+    res.send('This is POST');
 });
 
 module.exports = app;
