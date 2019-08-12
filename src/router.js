@@ -4,6 +4,7 @@ const router = express.Router();
 
 router.use((req, res, next) => {
     if (!Object.entries(req.body).length) {
+        console.log('\n\n::: Empty body! Aborting request! :::\n\n');
         return res.send('ok');
     }
 
@@ -12,22 +13,21 @@ router.use((req, res, next) => {
 
 router.post('/', async (req, res) => {
     try {
-        const { message, chatId } = telegramService.parse(req.body);
+        const { command, chatId } = telegramService.flatten(req.body);
 
-        switch (message) {
+        switch (command) {
             case '/meme':
                 await telegramService.sendRandomMeme(chatId);
-                break;
-            case '/joke':
+                return res.send('ok');
             case '/test':
                 await telegramService.sendText(chatId);
-                break;
+                return res.send('ok');
             default:
-                res.status(400).send('Me no understand what say you...');
+                return res.status(400).send('Нипанимаю брат чьто ты гавариш...');
         }
     } catch (err) {
-        console.error(err);
-        return res.status(500).send('Opps... Try again');
+        console.log(err);
+        return res.status(500).send('Нипалучилось...');
     }
 });
 
