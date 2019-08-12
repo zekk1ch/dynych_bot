@@ -5,10 +5,9 @@
     "use": "@now/node-server"
   }],
   "env": {
-    "TELEGRAM_SERVER_URL": "https://api.telegram.org/bot",
-    "TELEGRAM_API_TOKEN": "973688039:AAFUvaV2OpEEsLjz7wibGnhy10R_kpVq6Nk",
-    "MEMES_SERVER_URL": "https://admem.ru",
-    "MEMES_PATH": "/ajax/ASDF/rndm/ASDFA/SDF/",
+    "TELEGRAM_BOT_URL" :"https://api.telegram.org/bot973688039:AAFUvaV2OpEEsLjz7wibGnhy10R_kpVq6Nk",
+    "MEME_SERVER_URL": "https://admem.ru",
+    "MEME_URLS_PATH": "/ajax/ASDF/rndm/ASDFA/SDF/",
     "MEME_PATH": "/content/images"
   },
   "routes": [{
