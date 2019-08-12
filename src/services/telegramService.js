@@ -22,7 +22,17 @@ const sendMessage = async (text = '¯\\_(ツ)_/¯') => {
     }
 };
 
+const parseCommand = (body) => {
+    try {
+        return body.message.text.trim();
+    } catch (err) {
+        console.log(err);
+        throw new Error('Failed to parse command from message body');
+    }
+};
+
 module.exports = {
+    parseCommand,
     getRandomMemeUrl,
     sendMessage,
 };
