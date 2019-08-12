@@ -5,6 +5,7 @@ const constants = require('../constants');
 const getRandomMemeUrl = () => memeService.getRandomMemeUrl();
 
 const sendMessage = async (text = '¯\\_(ツ)_/¯') => {
+    console.log('\n\n::: Start sending back a message :::\n\n');
     const body = {
         // chat_id: message.chat.id,
         chat_id: 364204785,
@@ -13,10 +14,10 @@ const sendMessage = async (text = '¯\\_(ツ)_/¯') => {
     try {
         const data = await util.makeRequest(constants.telegramUrl, 'POST', body);
 
-        console.log('\n\nA message back was sent!\n\n');
+        console.log('\n\n::: A message back was sent! :::\n\n');
         console.log(data);
     } catch (err) {
-        console.log('\n\nFailed to send a message back\n\n');
+        console.log('\n\n::: Failed to send a message back :::\n\n');
         console.log(err);
     }
 };
