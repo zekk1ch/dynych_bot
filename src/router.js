@@ -3,11 +3,11 @@ const telegramService = require('./services/telegramService');
 const router = express.Router();
 
 router.use((req, res, next) => {
-    if (Object.entries(req.body).length) {
-        next();
+    if (!Object.entries(req.body).length) {
+        return res.send('ok');
     }
 
-    res.send('ok');
+    next();
 });
 
 router.post('/', async (req, res) => {
