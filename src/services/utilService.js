@@ -19,7 +19,7 @@ const makeRequest = async (url, method = 'GET', body) => {
     if (response.ok) {
         return data;
     } else {
-        console.log(options);
+        console.error(`\n\n::: Network connection error – ${method} ${url} :::\n\n`);
         console.log();
         console.log(data);
         throw new Error(JSON.stringify(data));
