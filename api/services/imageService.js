@@ -20,7 +20,6 @@ const fetchRandomMemeUrls = async () => {
 };
 
 const getRandomMemeUrl = async () => {
-    console.log(memeUrls);
     if (!memeUrls.length) {
         await fetchRandomMemeUrls();
     }
