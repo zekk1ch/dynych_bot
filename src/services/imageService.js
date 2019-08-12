@@ -5,8 +5,7 @@ let memeUrls = [];
 
 const fetchRandomMemeUrls = async () => {
     try {
-        const response = await util.makeRequest(constants.memeUrlsUrl);
-        const memes = await response.json();
+        const memes = await util.makeRequest(constants.memeUrlsUrl);
 
         Object.values(memes).forEach(meme => {
             if (meme.ImgSrc) {

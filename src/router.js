@@ -12,6 +12,7 @@ router.post('/', async (req, res) => {
         switch (message) {
             case '/meme':
                 const memeUrl = await telegramService.getRandomMemeUrl();
+                await telegramService.sendMessage();
                 return res.status(301).redirect(memeUrl);
             case '/joke':
         }
@@ -22,7 +23,5 @@ router.post('/', async (req, res) => {
 
     res.status(400).send('Me no understand what say you...');
 });
-
-router.use('/*', (req, res) => res.status(404).send(`Route "${req.method} ${req.originalUrl}" is not supported`));
 
 module.exports = router;
