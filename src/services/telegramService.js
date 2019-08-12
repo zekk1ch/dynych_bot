@@ -12,7 +12,7 @@ const sendMessage = async (text = '¯\\_(ツ)_/¯') => {
         text: '¯\\_(ツ)_/¯',
     };
     try {
-        const data = await util.makeRequest(constants.telegramUrl, 'POST', body);
+        const data = await util.makeRequest(constants.telegramUrl + '/sendMessage', 'POST', body);
 
         console.log('\n\n::: A message back was sent! :::\n\n');
         console.log(data);
