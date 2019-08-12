@@ -1,15 +1,9 @@
 const requestLogger = (req, res, next) => {
-    let info = `${req.method} ${req.originalUrl}`;
+    console.log(`\n${req.method} ${req.originalUrl}${req.body ? '' : '\n\n'}`);
     if (req.body) {
-        info += '\nbody:\n';
-        info += req.body;
-        info += '\n';
-        info += JSON.stringify(req.body);
-        info += '\n';
+        console.log(`\nbody:\n${req.body}`);
     }
-    info = `\n\n${info}\n\n`;
 
-    console.log(info);
     next();
 };
 
