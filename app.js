@@ -7,14 +7,11 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use('/', router);
-
-app.post('/', (req, res) => {
-    res.send('This is POST');
-});
 app.use('/*', (req, res, next) => {
-    console.log(req.method);
+    console.log('\n\n'+ req.method + '   ' + req.protocol + '://' + req.get('host') + req.originalUrl + '\n\n');
     next();
 });
+
+app.use('/', router);
 
 module.exports = app;
