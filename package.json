@@ -2,9 +2,9 @@
   "name": "dynych_bot",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
-    "start": "node scripts/startServer.js",
+    "start": "node .",
     "dev": "nodemon scripts/startServer.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
