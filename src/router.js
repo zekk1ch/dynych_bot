@@ -12,9 +12,11 @@ router.post('/', async (req, res) => {
         switch (message) {
             case '/meme':
                 const memeUrl = await telegramService.getRandomMemeUrl();
-                await telegramService.sendMessage();
                 return res.status(301).redirect(memeUrl);
             case '/joke':
+            case '/test':
+                await telegramService.sendMessage();
+                return res.send('ok');
         }
     } catch (err) {
         console.error(err);
