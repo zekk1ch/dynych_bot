@@ -1,31 +1,36 @@
-const util = require('./utilService');
+const fs = require('fs');
+const path = require('path');
+const events = require('events');
+const fetch = require('node-fetch');
 const constants = require('../constants');
 
-let memeUrls = [];
+const fetchImage = async (url) => {
+    const id = url.split('/').pop();
+    const imagePath = path.resolve(constants.rootPath, 'images', id);
 
-const fetchRandomMemeUrls = async () => {
     try {
-        const memes = await util.makeRequest(constants.memeUrlsUrl);
-
-        Object.values(memes).forEach(meme => {
-            if (meme.ImgSrc) {
-                memeUrls.push(`${constants.memeUrl}/${meme.ImgSrc[0]}`);
-            }
+        const response = await fetch(url);
+        const stream = fs.createWriteStream(imagePath, { flags: 'wx' });
+        response.body.pipe(stream);
+        return await new Promise((resolve, reject) => {
+            stream.on('finish', () => resolve(imagePath));
+            stream.on('error', (err) => reject(err));
         });
     } catch (err) {
         console.error(err);
-        throw new Error('Failed to load random image URLs');
+        throw new Error(`Failed to fetch image from ${url}`);
     }
 };
 
-const getRandomMemeUrl = async () => {
-    if (!memeUrls.length) {
-        await fetchRandomMemeUrls();
-    }
-
-    return memeUrls.shift();
+const deleteImageSilent = (imagePath) => {
+    fs.unlink(imagePath, (err) => {
+        if (err) {
+            console.error(err);
+        }
+    });
 };
 
 module.exports = {
-    getRandomMemeUrl,
+    fetchImage,
+    deleteImageSilent,
 };

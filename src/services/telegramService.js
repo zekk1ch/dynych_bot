@@ -1,8 +1,10 @@
-const memeService = require('./imageService');
+const fs = require('fs');
+const FormData = require('form-data');
 const util = require('./utilService');
 const constants = require('../constants');
+const emojis = require('../emojis');
 
-const flatten = (body = {}) => {
+const flatterRequestBody = (body = {}) => {
     let action, messageId, chatId, command, from, chat;
 
     if (body.message) {
@@ -21,26 +23,42 @@ const flatten = (body = {}) => {
     return { action, command, messageId, chatId, from, chat };
 };
 
-const sendText = async (chat_id, text = '¯\\_(ツ)_/¯') => {
-    try {
-        await util.makeRequest(constants.telegramUrl + '/sendMessage', 'POST', { chat_id, text });
-    } catch (err) {
-        console.error(err);
-    }
+const sendText = async (chatId, text = '¯\\_(ツ)_/¯') => {
+    const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            chat_id: chatId,
+            text,
+        }),
+    };
+    return util.makeRequest(constants.telegramUrl + '/sendMessage', options);
 };
 
-const sendRandomMeme = async (chat_id) => {
-    try {
-        const photo = await memeService.getRandomMemeUrl();
-        await util.makeRequest(constants.telegramUrl + '/sendPhoto', 'POST', { chat_id, photo });
-    } catch (err) {
-        console.error(err);
-        sendText('Нимагу найти ничего смешного, сорян братик :heart:');
-    }
+const sendRandomMeme = async (chatId) => {
+    // const memeUrl = await memeService.getRandomMemeUrl();
+    // const imagePath = await imageService.fetchImage(memeUrl);
+    const imagePath = '/home/user/Work/Projects/dynych_bot/images/1390975853.jpg';
+
+    const form = new FormData();
+    form.append('chat_id', chatId);
+    form.append('photo', fs.createReadStream(imagePath));
+
+    fetch(constants.telegramUrl + '/sendPhoto', { method: 'POST', body: form })
+        .then(function(res) {
+            return res.json();
+        }).then(function(json) {
+            console.log(json);
+        });
+
+
+    // setTimeout(() => imageService.deleteImageSilent(imagePath), 100); // immediate call to this function throws an UNCATCHABLE error
 };
 
 module.exports = {
-    flatten,
+    flatterRequestBody,
     sendRandomMeme,
     sendText,
 };

@@ -1,5 +1,7 @@
 const express = require('express');
 const telegramService = require('./services/telegramService');
+const util = require('./services/utilService');
+const emojis = require('./emojis');
 const router = express.Router();
 
 router.use((req, res, next) => {
@@ -13,21 +15,24 @@ router.use((req, res, next) => {
 
 router.post('/', async (req, res) => {
     try {
-        const { command, chatId } = telegramService.flatten(req.body);
+        const { command, chatId } = telegramService.flatterRequestBody(req.body);
 
         switch (command) {
             case '/meme':
                 await telegramService.sendRandomMeme(chatId);
-                return res.send('ok');
+                break;
             case '/test':
                 await telegramService.sendText(chatId);
-                return res.send('ok');
+                break;
             default:
-                return res.status(400).send('Нипанимаю брат чьто ты гавариш...');
+                await telegramService.sendText(chatId, `Ниманимаю чьто ты гаваришь братик ${emojis.man_wearing_turban}👳`);
         }
+
+        res.send('ok');
     } catch (err) {
         console.log(err);
-        return res.status(500).send('Нипалучилось...');
+        const { statusCode, message } = util.explainError(err);
+        res.status(statusCode).send(message);
     }
 });
 
