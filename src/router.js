@@ -1,7 +1,7 @@
 const express = require('express');
 const telegramService = require('./services/telegramService');
+const emojiService = require('./services/emojiService');
 const util = require('./services/utilService');
-const emojis = require('./emojis');
 const router = express.Router();
 
 router.use((req, res, next) => {
@@ -25,7 +25,7 @@ router.post('/', async (req, res) => {
                 await telegramService.sendText(chatId);
                 break;
             default:
-                await telegramService.sendText(chatId, `Ниманимаю чьто ты гаваришь братик ${emojis.man_wearing_turban}👳`);
+                await telegramService.sendText(chatId, `Ниманимаю чьто ты гаваришь братик ${emojiService.getRandomEmoji()}`);
         }
 
         res.send('ok');
