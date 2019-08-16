@@ -1,8 +1,19 @@
 const fs = require('fs');
 const FormData = require('form-data');
+const memeService = require('./memeService');
+const imageService = require('./imageService');
+const emojiService = require('./emojiService');
 const util = require('./utilService');
 const constants = require('../constants');
-const emojis = require('../emojis');
+const statusTypes = {
+    typing: 'typing',
+    uploadPhoto: 'upload_photo',
+    uploadAudio: 'upload_audio',
+    uploadVideo: 'upload_video',
+    uploadVideoNote: 'upload_video_note',
+    uploadDocument: 'upload_document',
+    findLocation: 'find_location',
+};
 
 const flatterRequestBody = (body = {}) => {
     let action, messageId, chatId, command, from, chat;
@@ -23,7 +34,7 @@ const flatterRequestBody = (body = {}) => {
     return { action, command, messageId, chatId, from, chat };
 };
 
-const sendText = async (chatId, text = '¯\\_(ツ)_/¯') => {
+const sendStatus = (chatId, status) => {
     const options = {
         method: 'POST',
         headers: {
@@ -31,34 +42,47 @@ const sendText = async (chatId, text = '¯\\_(ツ)_/¯') => {
         },
         body: JSON.stringify({
             chat_id: chatId,
-            text,
+            action: status,
+        }),
+    };
+    return util.makeRequest(constants.telegramUrl + '/sendChatAction', options);
+};
+
+const sendText = async (chatId, text) => {
+    await sendStatus(chatId, statusTypes.typing);
+
+    const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            chat_id: chatId,
+            text: text || emojiService.getRandomEmoji(),
         }),
     };
     return util.makeRequest(constants.telegramUrl + '/sendMessage', options);
 };
 
 const sendRandomMeme = async (chatId) => {
-    // const memeUrl = await memeService.getRandomMemeUrl();
-    // const imagePath = await imageService.fetchImage(memeUrl);
-    const imagePath = '/home/user/Work/Projects/dynych_bot/images/1390975853.jpg';
+    await sendStatus(chatId, statusTypes.uploadPhoto);
+
+    const memeUrl = await memeService.getRandomMemeUrl();
+    const imagePath = await imageService.fetchImage(memeUrl);
 
     const form = new FormData();
     form.append('chat_id', chatId);
     form.append('photo', fs.createReadStream(imagePath));
 
-    fetch(constants.telegramUrl + '/sendPhoto', { method: 'POST', body: form })
-        .then(function(res) {
-            return res.json();
-        }).then(function(json) {
-            console.log(json);
-        });
-
-
-    // setTimeout(() => imageService.deleteImageSilent(imagePath), 100); // immediate call to this function throws an UNCATCHABLE error
+    const options = {
+        method: 'POST',
+        body: form,
+    };
+    return util.makeRequest(constants.telegramUrl + '/sendPhoto', options);
 };
 
 module.exports = {
     flatterRequestBody,
-    sendRandomMeme,
     sendText,
+    sendRandomMeme,
 };

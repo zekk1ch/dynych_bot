@@ -22,10 +22,10 @@ router.post('/', async (req, res) => {
                 await telegramService.sendRandomMeme(chatId);
                 break;
             case '/test':
-                await telegramService.sendText(chatId);
+                await telegramService.sendText(chatId, `It a test --> ${emojiService.getRandomEmoji()}`);
                 break;
             default:
-                await telegramService.sendText(chatId, emojiService.getRandomEmoji());
+                await telegramService.sendText(chatId);
         }
 
         res.send('ok');
