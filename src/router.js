@@ -25,7 +25,7 @@ router.post('/', async (req, res) => {
                 await telegramService.sendText(chatId);
                 break;
             default:
-                await telegramService.sendText(chatId, `Ниманимаю чьто ты гаваришь братик ${emojiService.getRandomEmoji()}`);
+                await telegramService.sendText(chatId, emojiService.getRandomEmoji());
         }
 
         res.send('ok');
