@@ -78,7 +78,9 @@ const sendRandomMeme = async (chatId) => {
         method: 'POST',
         body: form,
     };
-    return util.makeRequest(constants.telegramUrl + '/sendPhoto', options);
+    await util.makeRequest(constants.telegramUrl + '/sendPhoto', options);
+
+    await imageService.deleteImage(imagePath);
 };
 
 module.exports = {

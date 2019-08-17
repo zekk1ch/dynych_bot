@@ -1,6 +1,5 @@
 const fs = require('fs');
 const path = require('path');
-const events = require('events');
 const fetch = require('node-fetch');
 const constants = require('../constants');
 
@@ -22,15 +21,16 @@ const fetchImage = async (url) => {
     }
 };
 
-const deleteImageSilent = (imagePath) => {
+const deleteImage = (imagePath) => new Promise((resolve, reject) => {
     fs.unlink(imagePath, (err) => {
         if (err) {
-            console.error(err);
+            reject(err);
         }
+        resolve();
     });
-};
+});
 
 module.exports = {
     fetchImage,
-    deleteImageSilent,
+    deleteImage,
 };
