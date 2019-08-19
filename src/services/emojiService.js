@@ -1,17 +1,17 @@
+const util = require('./utilService');
 const emojis = require('../emojis');
 
-const keys = Object.keys(emojis);
-const values = Object.values(emojis);
-const totalCount = keys.length;
-const totalDigits = totalCount.toString().length;
-
-const getRandomEmoji = () => {
-    const randomNumber = Math.floor(Math.random() * Number(`1${'0'.repeat(totalDigits)}`));
-    const index = randomNumber % totalCount;
-
-    return values[index];
+const movingEmojis = {
+    RED_HEART: emojis['RED_HEART'],
+    THUMBS_UP: emojis['THUMBS_UP'],
+    UNAMUSED_FACE: emojis['UNAMUSED_FACE'],
+    FLUSHED_FACE: emojis['FLUSHED_FACE'],
+    PARTYING_FACE: emojis['PARTYING_FACE'],
 };
 
+const getRandomEmoji = () => util.getRandomArrayItem(Object.values(emojis));
+
 module.exports = {
+    movingEmojis,
     getRandomEmoji,
 };

@@ -1,6 +1,9 @@
-const app = require('../app');
-const PORT = process.env.PORT || 3000;
+const env = require('../env');
 
-app.listen(PORT, () => {
-    console.log(`Telegram bot is listening on port ${PORT}`);
+const Sequelize = require('sequelize');
+global.sequelize = new Sequelize(env.DATABASE_URL);
+
+const app = require('../app');
+app.listen(env.PORT, () => {
+    console.log(`Telegram bot is listening on port ${env.PORT}`);
 });

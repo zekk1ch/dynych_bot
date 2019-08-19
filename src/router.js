@@ -15,17 +15,20 @@ router.use((req, res, next) => {
 
 router.post('/', async (req, res) => {
     try {
-        const { command, chatId } = telegramService.flatterRequestBody(req.body);
+        const { command, chatId } = telegramService.flattenRequestBody(req.body);
 
         switch (command) {
+            case '/start':
+                await telegramService.createChat(chatId);
+                break;
             case '/meme':
                 await telegramService.sendRandomMeme(chatId);
                 break;
-            case '/test':
-                await telegramService.sendText(chatId, `It a test --> ${emojiService.getRandomEmoji()}`);
+            case '/shuffle':
+                await telegramService.randomizeMemeUrls(chatId);
                 break;
             default:
-                await telegramService.sendText(chatId);
+                await telegramService.sendText(chatId, emojiService.getRandomEmoji());
         }
 
         res.send('ok');

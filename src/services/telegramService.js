@@ -1,10 +1,12 @@
 const fs = require('fs');
 const FormData = require('form-data');
-const memeService = require('./memeService');
+const chatService = require('./chatService');
 const imageService = require('./imageService');
 const emojiService = require('./emojiService');
 const util = require('./utilService');
+const models = require('../models');
 const constants = require('../constants');
+const emojis = require('../emojis');
 const statusTypes = {
     typing: 'typing',
     uploadPhoto: 'upload_photo',
@@ -15,7 +17,7 @@ const statusTypes = {
     findLocation: 'find_location',
 };
 
-const flatterRequestBody = (body = {}) => {
+const flattenRequestBody = (body = {}) => {
     let action, messageId, chatId, command, from, chat;
 
     if (body.message) {
@@ -24,7 +26,7 @@ const flatterRequestBody = (body = {}) => {
 
     switch (action) {
         case 'message':
-            command = body.message.text.trim();
+            command = body.message.text;
             messageId = body.message.message_id;
             chatId = body.message.chat.id;
             from = body.message.from;
@@ -34,7 +36,7 @@ const flatterRequestBody = (body = {}) => {
     return { action, command, messageId, chatId, from, chat };
 };
 
-const sendStatus = (chatId, status) => {
+const sendStatus = async (chatId, status) => {
     const options = {
         method: 'POST',
         headers: {
@@ -45,7 +47,7 @@ const sendStatus = (chatId, status) => {
             action: status,
         }),
     };
-    return util.makeRequest(constants.telegramUrl + '/sendChatAction', options);
+    await util.makeRequest(constants.telegramUrl + '/sendChatAction', options);
 };
 
 const sendText = async (chatId, text) => {
@@ -61,13 +63,13 @@ const sendText = async (chatId, text) => {
             text: text || emojiService.getRandomEmoji(),
         }),
     };
-    return util.makeRequest(constants.telegramUrl + '/sendMessage', options);
+    await util.makeRequest(constants.telegramUrl + '/sendMessage', options);
 };
 
 const sendRandomMeme = async (chatId) => {
     await sendStatus(chatId, statusTypes.uploadPhoto);
 
-    const memeUrl = await memeService.getRandomMemeUrl();
+    const memeUrl = await chatService.getMemeUrl(chatId);
     const imagePath = await imageService.fetchImage(memeUrl);
 
     const form = new FormData();
@@ -81,10 +83,32 @@ const sendRandomMeme = async (chatId) => {
     await util.makeRequest(constants.telegramUrl + '/sendPhoto', options);
 
     await imageService.deleteImage(imagePath);
+    await chatService.incrementMemeUrl(chatId);
+};
+
+const createChat = async (chatId) => {
+    const chat = await models.Chat.findByPk(chatId);
+    if (chat) {
+        await sendText(chatId, 'О, привет! А я тебя помню)');
+        await sendText(chatId, util.getRandomArrayItem(Object.values(emojiService.movingEmojis)));
+        return;
+    }
+
+    await chatService.createChat(chatId);
+
+    await sendText(chatId, `Приветик ${emojiService.getRandomEmoji()}`);
+    await sendText(chatId, util.getRandomArrayItem(Object.values(emojiService.movingEmojis)));
+};
+
+const randomizeMemeUrls = async (chatId) => {
+    await chatService.randomizeMemeUrls(chatId);
+    await sendText(chatId, emojis.OK_HAND);
 };
 
 module.exports = {
-    flatterRequestBody,
+    flattenRequestBody,
     sendText,
     sendRandomMeme,
+    createChat,
+    randomizeMemeUrls,
 };

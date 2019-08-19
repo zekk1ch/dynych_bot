@@ -1,5 +1,5 @@
-node_modules
-.idea
-images
-TODO.js
-test.js
+/.idea
+/node_modules
+/images
+/TODO.js
+/test.js

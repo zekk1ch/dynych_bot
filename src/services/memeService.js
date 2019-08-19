@@ -27,6 +27,15 @@ const getRandomMemeUrl = async () => {
     return memeUrls.shift();
 };
 
+const getRandomMemeUrls = async () => {
+    if (!memeUrls.length) {
+        await fetchRandomMemeUrls();
+
+    }
+    return memeUrls.splice(0, memeUrls.length);
+};
+
 module.exports = {
     getRandomMemeUrl,
+    getRandomMemeUrls,
 };
