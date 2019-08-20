@@ -25,7 +25,8 @@
     "form-data": "^2.5.0",
     "node-fetch": "^2.6.0",
     "pg": "^7.12.1",
-    "sequelize": "^5.15.1"
+    "sequelize": "^5.15.1",
+    "ytdl-core": "^0.29.5"
   },
   "devDependencies": {
     "nodemon": "^1.19.1"

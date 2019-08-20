@@ -1,31 +1,42 @@
 const express = require('express');
 const telegramService = require('./services/telegramService');
 const emojiService = require('./services/emojiService');
-const util = require('./services/utilService');
 const router = express.Router();
 
 router.use((req, res, next) => {
-    if (!Object.entries(req.body).length) {
-        console.log('\n\n::: Empty body! Aborting request! :::\n\n');
-        return res.send('ok');
-    }
+    try {
+        req.telegram = telegramService.flattenRequestBody(req.body);
 
-    next();
+        next();
+    } catch (err) {
+        console.log(err);
+        res.send(`${emojiService.emojis.CONFUSED_FACE} not ok though`);
+    }
 });
 
 router.post('/', async (req, res) => {
-    try {
-        const { command, chatId } = telegramService.flattenRequestBody(req.body);
+    const { command, params, chatId } = req.telegram;
 
+    try {
         switch (command) {
             case '/start':
                 await telegramService.createChat(chatId);
                 break;
+            case '/echo':
+                const echo = params || emojiService.getRandomMovingEmoji();
+                await telegramService.sendText(chatId, echo);
+                break;
             case '/meme':
                 await telegramService.sendRandomMeme(chatId);
                 break;
-            case '/shuffle':
+            case '/shuffle_memes':
                 await telegramService.randomizeMemeUrls(chatId);
+                break;
+            case '/video':
+                await telegramService.sendVideo(chatId, params);
+                break;
+            case '/audio':
+                await telegramService.sendAudio(chatId, params);
                 break;
             default:
                 await telegramService.sendText(chatId, emojiService.getRandomEmoji());
@@ -34,8 +45,14 @@ router.post('/', async (req, res) => {
         res.send('ok');
     } catch (err) {
         console.log(err);
-        const { statusCode, message } = util.explainError(err);
-        res.status(statusCode).send(message);
+
+        try {
+            await telegramService.sendText(chatId, `Ошибочка... ${emojiService.emojis.ANGRY_FACE}\n\n${err.message || ''}`);
+
+            res.send('ok ok');
+        } catch {
+            return res.status(500).send(`${emojiService.emojis.CONFUSED_FACE} not ok`);
+        }
     }
 });
 

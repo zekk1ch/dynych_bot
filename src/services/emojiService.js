@@ -11,7 +11,11 @@ const movingEmojis = {
 
 const getRandomEmoji = () => util.getRandomArrayItem(Object.values(emojis));
 
+const getRandomMovingEmoji = () => util.getRandomArrayItem(Object.values(movingEmojis));
+
 module.exports = {
+    emojis,
     movingEmojis,
     getRandomEmoji,
+    getRandomMovingEmoji,
 };

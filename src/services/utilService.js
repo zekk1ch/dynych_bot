@@ -7,14 +7,9 @@ const makeRequest = async (url, options) => {
     if (response.ok) {
         return data;
     } else {
-        throw data;
+        throw new Error(JSON.stringify(data));
     }
 };
-
-const explainError = () => ({
-    statusCode: 500,
-    message: 'Что-то пошло не так...',
-});
 
 const sleep = (ms = 1000) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -43,7 +38,6 @@ const randomizeArray = (array) => {
 
 module.exports = {
     makeRequest,
-    explainError,
     sleep,
     getRandomArrayItem,
     randomizeArray,
