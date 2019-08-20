@@ -5,7 +5,7 @@ const ytdl = require('ytdl-core');
 const constants = require('../constants');
 
 const saveFile = (fileName, readStream) => new Promise((resolve, reject) => {
-    const filePath = path.resolve(constants.rootPath, '../temp', fileName);
+    const filePath = path.join(constants.rootPath, 'temp', fileName);
 
     const writeStream = fs.createWriteStream(filePath, { flags: 'wx' });
     readStream.pipe(writeStream);
