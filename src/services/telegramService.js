@@ -130,7 +130,7 @@ const sendVideo = async (chatId, url) => {
         method: 'POST',
         body: form,
     };
-    await util.makeRequest(constants.telegramUrl + '/2sendVideo', options);
+    await util.makeRequest(constants.telegramUrl + '/sendVideo', options);
 
     await mediaService.deleteFile(filePath);
 };
