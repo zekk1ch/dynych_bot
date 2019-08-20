@@ -15,6 +15,7 @@ router.use((req, res, next) => {
 });
 
 router.post('/', async (req, res) => {
+    console.log(req.telegram);
     const { command, params, chatId } = req.telegram;
 
     try {
