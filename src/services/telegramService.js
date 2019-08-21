@@ -27,7 +27,7 @@ const flattenRequestBody = (body = {}) => {
     }
     else if (body.callback_query) {
         action = 'callback';
-        data = body.callback_query;
+        data = body.callback_query.message;
         text = data.data;
     }
     else {
