@@ -29,7 +29,7 @@ const flattenRequestBody = (body = {}) => {
 
     const text = data.text;
     const matched = text.match(/(?<command>\/[a-z_0-9]+)( +)?(?<params>.+)?/i) || { groups: {} };
-    const { command = null, params = null } = matched.groups;
+    let { command = null, params = null } = matched.groups;
 
     return {
         action,
