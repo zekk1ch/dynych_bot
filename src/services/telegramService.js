@@ -152,6 +152,7 @@ const sendVideo = async (chatId, url) => {
     const form = new FormData();
     form.append('chat_id', chatId);
     form.append('video', fs.createReadStream(filePath));
+    form.append('parse_mode', 'HTML');
     form.append('caption', `<a href="${url}">${filePath.split('/').pop().replace(/\..+$/i, '')}</a>`);
 
     const options = {
@@ -171,6 +172,7 @@ const sendAudio = async (chatId, url) => {
     const form = new FormData();
     form.append('chat_id', chatId);
     form.append('audio', fs.createReadStream(filePath));
+    form.append('parse_mode', 'HTML');
     form.append('caption', `<a href="${url}">${filePath.split('/').pop().replace(/\..+$/i, '')}</a>`);
 
     const options = {
