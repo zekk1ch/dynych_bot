@@ -32,6 +32,9 @@ router.post('/', async (req, res) => {
             case '/shuffle_memes':
                 await telegramService.randomizeMemeUrls(chatId);
                 break;
+            case '/save_from_youtube':
+                await telegramService.saveFromYoutube(chatId, params);
+                break;
             case '/video':
                 await telegramService.sendVideo(chatId, params);
                 break;

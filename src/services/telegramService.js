@@ -1,4 +1,5 @@
 const fs = require('fs');
+const ytdl = require('ytdl-core');
 const FormData = require('form-data');
 const chatService = require('./chatService');
 const mediaService = require('./mediaService');
@@ -17,19 +18,31 @@ const statusTypes = {
 };
 
 const flattenRequestBody = (body = {}) => {
-    let action, data;
+    let action, data, text;
 
     if (body.message) {
         action = 'message';
         data = body.message;
+        text = data.text;
     }
-    if (!action) {
+    else if (body.callback_query) {
+        action = 'callback';
+        data = body.callback_query;
+        text = data.data;
+    }
+    else {
         throw new Error('Unknown action');
     }
 
-    const text = data.text;
-    const matched = text.match(/(?<command>\/[a-z_0-9]+)( +)?(?<params>.+)?/i) || { groups: {} };
-    let { command = null, params = null } = matched.groups;
+    let command = null, params = null;
+    if (ytdl.validateURL(text)) {
+        command = '/save_from_youtube';
+        params = text;
+    } else {
+        const matched = text.match(/(?<command>\/[a-z_0-9]+)( +)?(?<params>.+)?/i) || { groups: {} };
+        command = matched.groups.command;
+        params = matched.groups.params;
+    }
 
     return {
         action,
@@ -57,7 +70,7 @@ const sendStatus = async (chatId, status) => {
     await util.makeRequest(constants.telegramUrl + '/sendChatAction', options);
 };
 
-const sendText = async (chatId, text) => {
+const sendText = async (chatId, text, replyMarkup) => {
     await sendStatus(chatId, statusTypes.typing);
 
     const options = {
@@ -67,7 +80,10 @@ const sendText = async (chatId, text) => {
         },
         body: JSON.stringify({
             chat_id: chatId,
-            text: text || emojiService.getRandomEmoji(),
+            text: text || (replyMarkup ? '' : emojiService.getRandomEmoji()),
+            parse_mode: 'HTML',
+            disable_web_page_preview: true,
+            reply_markup: replyMarkup,
         }),
     };
     await util.makeRequest(constants.telegramUrl + '/sendMessage', options);
@@ -115,8 +131,20 @@ const randomizeMemeUrls = async (chatId) => {
     await sendText(chatId, emojiService.emojis.OK_HAND);
 };
 
-const sendVideo = async (chatId, url) => {
+const saveFromYoutube = async (chatId, url) => {
+    const {title} = await ytdl.getBasicInfo(url);
 
+    const text = `<a href="${url}">${title}</a>\n\nВ каком формате сохранить видос?`;
+    const replyMarkup = {
+        inline_keyboard: [[
+            { text: 'Аудио', callback_data: `/audio ${url}` },
+            { text: 'Видео', callback_data: `/video ${url}` },
+        ]],
+    };
+    await sendText(chatId, text, replyMarkup);
+};
+
+const sendVideo = async (chatId, url) => {
     await sendStatus(chatId, statusTypes.uploadVideo);
 
     const filePath = await mediaService.fetchVideo(url);
@@ -124,7 +152,7 @@ const sendVideo = async (chatId, url) => {
     const form = new FormData();
     form.append('chat_id', chatId);
     form.append('video', fs.createReadStream(filePath));
-    form.append('caption', filePath.split('/').pop().replace(/\..+$/i, ''));
+    form.append('caption', `<a href="${url}">${filePath.split('/').pop().replace(/\..+$/i, '')}</a>`);
 
     const options = {
         method: 'POST',
@@ -143,7 +171,7 @@ const sendAudio = async (chatId, url) => {
     const form = new FormData();
     form.append('chat_id', chatId);
     form.append('audio', fs.createReadStream(filePath));
-    form.append('caption', filePath.split('/').pop().replace(/\..+$/i, ''));
+    form.append('caption', `<a href="${url}">${filePath.split('/').pop().replace(/\..+$/i, '')}</a>`);
 
     const options = {
         method: 'POST',
@@ -160,6 +188,7 @@ module.exports = {
     sendRandomMeme,
     createChat,
     randomizeMemeUrls,
+    saveFromYoutube,
     sendVideo,
     sendAudio,
 };
