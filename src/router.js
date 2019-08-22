@@ -23,7 +23,7 @@ router.post('/', async (req, res) => {
                 await telegramService.createChat(chatId);
                 break;
             case '/echo':
-                const echo = params || emojiService.getRandomMovingEmoji();
+                const echo = params || emojiService.getRandomEmoji(emojiService.movingEmojis);
                 await telegramService.sendText(chatId, echo);
                 break;
             case '/meme':
@@ -42,7 +42,7 @@ router.post('/', async (req, res) => {
                 await telegramService.sendAudio(chatId, params, { callbackId, replyMessageId });
                 break;
             default:
-                await telegramService.sendText(chatId, emojiService.getRandomEmoji());
+                await telegramService.sendText(chatId, emojiService.getRandomEmoji(emojiService.facepalmEmojis));
         }
 
         res.send('ok');

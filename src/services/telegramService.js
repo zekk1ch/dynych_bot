@@ -113,13 +113,13 @@ const createChat = async (chatId) => {
     const chat = await chatService.getChat(chatId);
     if (chat) {
         await sendText(chatId, 'О, привет! А я тебя помню)');
-        await sendText(chatId, emojiService.getRandomMovingEmoji());
+        await sendText(chatId, emojiService.getRandomEmoji(emojiService.movingEmojis));
         return;
     }
     await chatService.createChat(chatId);
 
     await sendText(chatId, 'Приветик)');
-    await sendText(chatId, emojiService.getRandomMovingEmoji());
+    await sendText(chatId, emojiService.getRandomEmoji(emojiService.movingEmojis));
 };
 
 const randomizeMemeUrls = async (chatId) => {
