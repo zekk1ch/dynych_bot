@@ -50,7 +50,7 @@ router.post('/', async (req, res) => {
         console.log(err);
 
         try {
-            await telegramService.sendText(chatId, `Ошибочка... ${emojiService.emojis.ANGRY_FACE}\n\n${err.message || ''}`);
+            await telegramService.sendText(chatId, `Ошибочка... ${emojiService.emojis.THINKING_FACE}\n\n${err.message || ''}`);
 
             res.send('ok ok');
         } catch {
