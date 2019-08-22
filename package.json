@@ -1,37 +1,37 @@
 {
-  "name": "dynych_bot",
-  "version": "1.0.0",
-  "description": "",
-  "main": "scripts/startServer.js",
-  "scripts": {
-    "start": "node scripts/startServer.js",
-    "dev": "nodemon scripts/startServer.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/yev-p/dynych_bot.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/yev-p/dynych_bot/issues"
-  },
-  "homepage": "https://github.com/yev-p/dynych_bot#readme",
-  "dependencies": {
-    "body-parser": "^1.19.0",
-    "express": "^4.17.1",
-    "form-data": "^2.5.0",
-    "node-fetch": "^2.6.0",
-    "pg": "^7.12.1",
-    "sequelize": "^5.15.1",
-    "ytdl-core": "^0.29.5"
-  },
-  "devDependencies": {
-    "nodemon": "^1.19.1"
-  },
-  "engines": {
-    "node": "10.x"
-  }
+    "name": "dynych_bot",
+    "version": "1.0.0",
+    "description": "",
+    "main": "scripts/startServer.js",
+    "scripts": {
+        "start": "node scripts/startServer.js",
+        "dev": "nodemon scripts/startServer.js",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/yev-p/dynych_bot.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/yev-p/dynych_bot/issues"
+    },
+    "homepage": "https://github.com/yev-p/dynych_bot#readme",
+    "dependencies": {
+        "body-parser": "^1.19.0",
+        "express": "^4.17.1",
+        "form-data": "^2.5.0",
+        "node-fetch": "^2.6.0",
+        "pg": "^7.12.1",
+        "sequelize": "^5.15.1",
+        "ytdl-core": "^0.29.5"
+    },
+    "devDependencies": {
+        "nodemon": "^1.19.1"
+    },
+    "engines": {
+        "node": "10.x"
+    }
 }
