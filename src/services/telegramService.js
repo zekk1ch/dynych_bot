@@ -28,9 +28,9 @@ const flattenRequestBody = (body = {}) => {
         action = 'callback';
         data = body.callback_query.message;
         try {
-            const parsed = JSON.parse(body.callback_query.data);
-            text = parsed.text;
-            replyMessageId = parsed.replyMessageId;
+            const { t, r } = JSON.parse(body.callback_query.data);
+            text = `${t} ${data.entities[0].url}`;
+            replyMessageId = r;
         } catch {
             text = body.callback_query.data;
         }
@@ -142,8 +142,8 @@ const saveFromYoutube = async (chatId, messageId, url) => {
     const text = `<a href="${url}">${title}</a>\n\nВ каком формате сохранить видос?`;
     const replyMarkup = {
         inline_keyboard: [[
-            { text: 'Аудио', callback_data: JSON.stringify({ text: `/audio ${url}`, replyMessageId: messageId }) },
-            { text: 'Видео', callback_data: JSON.stringify({ text: `/video ${url}`, replyMessageId: messageId }) },
+            { text: 'Аудио', callback_data: JSON.stringify({ t: '/audio', r: messageId }) },
+            { text: 'Видео', callback_data: JSON.stringify({ t: '/video', r: messageId }) },
         ]],
     };
     await sendText(chatId, text, replyMarkup);
