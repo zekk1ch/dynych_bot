@@ -205,10 +205,13 @@ const wrapSendStatus = (status, func) => async (chatId, ...args) => {
     await sendStatus(chatId, status);
     const intervalId = setInterval(() => sendStatus(chatId, status), 5000);
 
-    const res = await func(chatId, ...args);
-
-    clearInterval(intervalId);
-    return res;
+    try {
+        return await func(chatId, ...args);
+    } catch (err) {
+        throw err;
+    } finally {
+        clearInterval(intervalId);
+    }
 };
 
 module.exports = {
