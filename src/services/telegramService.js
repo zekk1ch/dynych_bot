@@ -17,7 +17,7 @@ const statusTypes = {
 };
 
 const flattenRequestBody = (body = {}) => {
-    let action, data, text, replyMessageId;
+    let action, data, text, replyMessageId, callbackId;
 
     if (body.message) {
         action = 'message';
@@ -27,6 +27,7 @@ const flattenRequestBody = (body = {}) => {
     else if (body.callback_query) {
         action = 'callback';
         data = body.callback_query.message;
+        callbackId = body.callback_query.id;
         try {
             const { t, r } = JSON.parse(body.callback_query.data);
             text = `${t} ${data.entities[0].url}`;
@@ -51,9 +52,10 @@ const flattenRequestBody = (body = {}) => {
 
     return {
         action,
-        messageId: data.message_id,
         chatId: data.chat.id,
+        messageId: data.message_id,
         replyMessageId,
+        callbackId,
         command,
         params,
         text,
@@ -101,11 +103,7 @@ const sendRandomMeme = async (chatId) => {
     form.append('chat_id', chatId);
     form.append('photo', fs.createReadStream(filePath));
 
-    const options = {
-        method: 'POST',
-        body: form,
-    };
-    await util.makeRequest(constants.telegramUrl + '/sendPhoto', options);
+    await util.makeRequest(constants.telegramUrl + '/sendPhoto', { method: 'POST', body: form });
 
     await chatService.incrementMemeUrl(chatId);
     await mediaService.deleteFile(filePath);
@@ -142,7 +140,7 @@ const saveFromYoutube = async (chatId, messageId, url) => {
     await sendText(chatId, text, replyMarkup);
 };
 
-const sendVideo = async (chatId, url, replyMessageId) => {
+const sendVideo = async (chatId, url, { callbackId, replyMessageId } = {}) => {
     const { filePath, thumbnailPath } = await mediaService.fetchVideo(url);
 
     const form = new FormData();
@@ -153,11 +151,20 @@ const sendVideo = async (chatId, url, replyMessageId) => {
         form.append('reply_to_message_id', replyMessageId);
     }
 
-    const options = {
-        method: 'POST',
-        body: form,
-    };
-    await util.makeRequest(constants.telegramUrl + '/sendVideo', options);
+    await util.makeRequest(constants.telegramUrl + '/sendVideo', { method: 'POST', body: form });
+    if (callbackId) {
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                callback_query_id: callbackId,
+                show_alert: false,
+            }),
+        };
+        await util.makeRequest(constants.telegramUrl + '/answerCallbackQuery', options);
+    }
 
     await Promise.all([
         mediaService.deleteFile(filePath),
@@ -165,7 +172,7 @@ const sendVideo = async (chatId, url, replyMessageId) => {
     ]);
 };
 
-const sendAudio = async (chatId, url, replyMessageId) => {
+const sendAudio = async (chatId, url, { callbackId, replyMessageId } = {}) => {
     const { filePath, thumbnailPath } = await mediaService.fetchVideo(url, 'mp3');
 
     const form = new FormData();
@@ -179,11 +186,20 @@ const sendAudio = async (chatId, url, replyMessageId) => {
         form.append('reply_to_message_id', replyMessageId);
     }
 
-    const options = {
-        method: 'POST',
-        body: form,
-    };
-    await util.makeRequest(constants.telegramUrl + '/sendAudio', options);
+    await util.makeRequest(constants.telegramUrl + '/sendAudio', { method: 'POST', body: form });
+    if (callbackId) {
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                callback_query_id: callbackId,
+                show_alert: false,
+            }),
+        };
+        await util.makeRequest(constants.telegramUrl + '/answerCallbackQuery', options);
+    }
 
     await Promise.all([
         mediaService.deleteFile(filePath),
