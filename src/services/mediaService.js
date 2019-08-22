@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const fetch = require('node-fetch');
 const ytdl = require('ytdl-core');
+const util = require('./utilService');
 const constants = require('../constants');
 
 const saveFile = (fileName, readStream) => new Promise((resolve, reject) => {
@@ -29,55 +30,42 @@ const deleteFile = (filePath) => new Promise((resolve, reject) => {
     });
 });
 
-const fetchImage = async (url) => {
+const fetchImage = async (url, fileName) => {
     try {
         const response = await fetch(url);
 
-        const fileName = url.split('/').pop();
-        return await saveFile(fileName, response.body);
+        return await saveFile(fileName || url.split('/').pop(), response.body);
     } catch (err) {
         console.error(err);
         throw new Error(`Failed to fetch image from ${url}`);
     }
 };
 
-const fetchVideo = async (url) => {
+const fetchVideo = async (url, format = 'mp4') => {
     if (!ytdl.validateURL(url)) {
         throw new Error(`Invalid video URL – ${url}`);
     }
 
     try {
-        const response = await ytdl(url, { format: 'mp4' });
+        const [info, response] = await Promise.all([
+            ytdl.getBasicInfo(url),
+            ytdl(url, { format }),
+        ]);
 
-        const { title } = await ytdl.getBasicInfo(url);
-        const fileName = `${title}.mp4`;
-        return await saveFile(fileName, response);
+        const [filePath, thumbnailPath] = await Promise.all([
+            saveFile(`${info.title}.${format}`, response),
+            fetchImage(info.player_response.videoDetails.thumbnail.thumbnails[2].url, `${util.getRandomString()}.jpeg`),
+        ]);
+
+        return { filePath, thumbnailPath };
     } catch (err) {
         console.error(err);
-        throw new Error(`Failed to download video from ${url}`);
-    }
-};
-
-const extractAudio = async (url) => {
-    if (!ytdl.validateURL(url)) {
-        throw new Error(`Invalid video URL – ${url}`);
-    }
-
-    try {
-        const response = await ytdl(url, { format: 'mp3' });
-
-        const { title } = await ytdl.getBasicInfo(url);
-        const fileName = `${title}.mp3`;
-        return await saveFile(fileName, response);
-    } catch (err) {
-        console.error(err);
-        throw new Error(`Failed to extract audio from ${url}`);
+        throw new Error(`Failed to fetch video from ${url}`);
     }
 };
 
 module.exports = {
     fetchImage,
     fetchVideo,
-    extractAudio,
     deleteFile,
 };

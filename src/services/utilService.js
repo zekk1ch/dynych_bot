@@ -20,6 +20,8 @@ const getRandomNumber = (max) => {
     return randomNumber % max;
 };
 
+const getRandomString = () => Math.random().toString().slice(2);
+
 const getRandomArrayItem = (array) => {
     const randomIndex = getRandomNumber(array.length);
     return array[randomIndex];
@@ -44,11 +46,11 @@ const getAudioMetadata = (filePath) => {
     const fileName = path.basename(filePath).replace(/\..+$/i, '');
     if (fileName.includes(delimiter)) {
         const splitted = fileName.split(delimiter);
-        title = splitted[0];
-        performer = splitted.slice(1).join(delimiter);
+        performer = splitted[0];
+        title = splitted.slice(1).join(delimiter);
     } else {
-        title = fileName;
         performer = 'dynych_bot';
+        title = fileName;
     }
 
     return { title, performer };
@@ -57,6 +59,7 @@ const getAudioMetadata = (filePath) => {
 module.exports = {
     makeRequest,
     sleep,
+    getRandomString,
     getRandomArrayItem,
     randomizeArray,
     getAudioMetadata,

@@ -77,8 +77,6 @@ const sendStatus = async (chatId, status) => {
 };
 
 const sendText = async (chatId, text, replyMarkup) => {
-    await sendStatus(chatId, statusTypes.typing);
-
     const options = {
         method: 'POST',
         headers: {
@@ -96,8 +94,6 @@ const sendText = async (chatId, text, replyMarkup) => {
 };
 
 const sendRandomMeme = async (chatId) => {
-    await sendStatus(chatId, statusTypes.uploadPhoto);
-
     const url = await chatService.getMemeUrl(chatId);
     const filePath = await mediaService.fetchImage(url);
 
@@ -116,8 +112,6 @@ const sendRandomMeme = async (chatId) => {
 };
 
 const createChat = async (chatId) => {
-    await sendStatus(chatId, statusTypes.typing);
-
     const chat = await chatService.getChat(chatId);
     if (chat) {
         await sendText(chatId, 'О, привет! А я тебя помню)');
@@ -131,7 +125,6 @@ const createChat = async (chatId) => {
 };
 
 const randomizeMemeUrls = async (chatId) => {
-    await sendStatus(chatId, statusTypes.typing);
     await chatService.randomizeMemeUrls(chatId);
     await sendText(chatId, emojiService.emojis.OK_HAND);
 };
@@ -150,13 +143,12 @@ const saveFromYoutube = async (chatId, messageId, url) => {
 };
 
 const sendVideo = async (chatId, url, replyMessageId) => {
-    await sendStatus(chatId, statusTypes.uploadVideo);
-
-    const filePath = await mediaService.fetchVideo(url);
+    const { filePath, thumbnailPath } = await mediaService.fetchVideo(url);
 
     const form = new FormData();
     form.append('chat_id', chatId);
     form.append('video', fs.createReadStream(filePath));
+    form.append('thumb', fs.createReadStream(thumbnailPath));
     if (replyMessageId) {
         form.append('reply_to_message_id', replyMessageId);
     }
@@ -167,17 +159,19 @@ const sendVideo = async (chatId, url, replyMessageId) => {
     };
     await util.makeRequest(constants.telegramUrl + '/sendVideo', options);
 
-    await mediaService.deleteFile(filePath);
+    await Promise.all([
+        mediaService.deleteFile(filePath),
+        mediaService.deleteFile(thumbnailPath),
+    ]);
 };
 
 const sendAudio = async (chatId, url, replyMessageId) => {
-    await sendStatus(chatId, statusTypes.uploadAudio);
-
-    const filePath = await mediaService.extractAudio(url);
+    const { filePath, thumbnailPath } = await mediaService.fetchVideo(url, 'mp3');
 
     const form = new FormData();
     form.append('chat_id', chatId);
     form.append('audio', fs.createReadStream(filePath));
+    form.append('thumb', fs.createReadStream(thumbnailPath));
     const { title, performer } = util.getAudioMetadata(filePath);
     form.append('title', title);
     form.append('performer', performer);
@@ -191,16 +185,31 @@ const sendAudio = async (chatId, url, replyMessageId) => {
     };
     await util.makeRequest(constants.telegramUrl + '/sendAudio', options);
 
-    await mediaService.deleteFile(filePath);
+    await Promise.all([
+        mediaService.deleteFile(filePath),
+        mediaService.deleteFile(thumbnailPath),
+    ]);
+};
+
+const wrapSendStatus = (status, func) => async (chatId, ...args) => {
+    await sendStatus(chatId, status);
+    const intervalId = setInterval(() => sendStatus(chatId, status), 5000);
+
+    const res = await func(chatId, ...args);
+
+    if (intervalId) {
+        clearInterval(intervalId);
+    }
+    return res;
 };
 
 module.exports = {
     flattenRequestBody,
-    sendText,
-    sendRandomMeme,
-    createChat,
-    randomizeMemeUrls,
-    saveFromYoutube,
-    sendVideo,
-    sendAudio,
+    sendText: wrapSendStatus(statusTypes.typing, sendText),
+    sendRandomMeme: wrapSendStatus(statusTypes.uploadPhoto, sendRandomMeme),
+    createChat: wrapSendStatus(statusTypes.typing, createChat),
+    randomizeMemeUrls: wrapSendStatus(statusTypes.typing, randomizeMemeUrls),
+    saveFromYoutube: wrapSendStatus(statusTypes.typing, saveFromYoutube),
+    sendVideo: wrapSendStatus(statusTypes.uploadAudio, sendVideo),
+    sendAudio: wrapSendStatus(statusTypes.uploadAudio, sendAudio),
 };
