@@ -140,6 +140,20 @@ const saveFromYoutube = async (chatId, messageId, url) => {
     await sendText(chatId, text, replyMarkup);
 };
 
+const answerCallback = (callbackId) => {
+    const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            callback_query_id: callbackId,
+            show_alert: false,
+        }),
+    };
+    return util.makeRequest(constants.telegramUrl + '/answerCallbackQuery', options);
+};
+
 const sendVideo = async (chatId, url, { callbackId, replyMessageId } = {}) => {
     const { filePath, thumbnailPath } = await mediaService.fetchVideo(url);
 
@@ -153,17 +167,7 @@ const sendVideo = async (chatId, url, { callbackId, replyMessageId } = {}) => {
 
     await util.makeRequest(constants.telegramUrl + '/sendVideo', { method: 'POST', body: form });
     if (callbackId) {
-        const options = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                callback_query_id: callbackId,
-                show_alert: false,
-            }),
-        };
-        await util.makeRequest(constants.telegramUrl + '/answerCallbackQuery', options);
+        await answerCallback(callbackId);
     }
 
     await Promise.all([
@@ -188,17 +192,7 @@ const sendAudio = async (chatId, url, { callbackId, replyMessageId } = {}) => {
 
     await util.makeRequest(constants.telegramUrl + '/sendAudio', { method: 'POST', body: form });
     if (callbackId) {
-        const options = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                callback_query_id: callbackId,
-                show_alert: false,
-            }),
-        };
-        await util.makeRequest(constants.telegramUrl + '/answerCallbackQuery', options);
+        await answerCallback(callbackId);
     }
 
     await Promise.all([
@@ -213,9 +207,7 @@ const wrapSendStatus = (status, func) => async (chatId, ...args) => {
 
     const res = await func(chatId, ...args);
 
-    if (intervalId) {
-        clearInterval(intervalId);
-    }
+    clearInterval(intervalId);
     return res;
 };
 
