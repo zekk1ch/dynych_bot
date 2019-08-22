@@ -1,3 +1,4 @@
+const path = require('path');
 const fetch = require('node-fetch');
 
 const makeRequest = async (url, options) => {
@@ -36,9 +37,27 @@ const randomizeArray = (array) => {
     return randomized;
 };
 
+const getAudioMetadata = (filePath) => {
+    const delimiter = ' - ';
+    let title, performer;
+
+    const fileName = path.basename(filePath).replace(/\..+$/i, '');
+    if (fileName.includes(delimiter)) {
+        const splitted = fileName.split(delimiter);
+        title = splitted[0];
+        performer = splitted.slice(1).join(delimiter);
+    } else {
+        title = fileName;
+        performer = 'dynych_bot';
+    }
+
+    return { title, performer };
+};
+
 module.exports = {
     makeRequest,
     sleep,
     getRandomArrayItem,
     randomizeArray,
+    getAudioMetadata,
 };

@@ -2,6 +2,8 @@ const util = require('./utilService');
 const masterService = require('./masterService');
 const models = require('../models');
 
+const getChat = (id) => models.Chat.findByPk(id);
+
 const createChat = async (id) => {
     const masterMemeUrls = await masterService.getMasterMemeUrls();
     const memeUrls = util.randomizeArray(masterMemeUrls);
@@ -44,6 +46,7 @@ const incrementMemeUrl = async (id) => {
 };
 
 module.exports = {
+    getChat,
     createChat,
     randomizeMemeUrls,
     getMemeUrl,

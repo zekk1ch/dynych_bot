@@ -15,7 +15,7 @@ router.use((req, res, next) => {
 });
 
 router.post('/', async (req, res) => {
-    const { command, params, chatId } = req.telegram;
+    const { command, params, chatId, replyMessageId } = req.telegram;
 
     try {
         switch (command) {
@@ -33,13 +33,13 @@ router.post('/', async (req, res) => {
                 await telegramService.randomizeMemeUrls(chatId);
                 break;
             case '/save_from_youtube':
-                await telegramService.saveFromYoutube(chatId, params);
+                await telegramService.saveFromYoutube(chatId, messageId, params);
                 break;
             case '/video':
-                await telegramService.sendVideo(chatId, params);
+                await telegramService.sendVideo(chatId, params, replyMessageId);
                 break;
             case '/audio':
-                await telegramService.sendAudio(chatId, params);
+                await telegramService.sendAudio(chatId, params, replyMessageId);
                 break;
             default:
                 await telegramService.sendText(chatId, emojiService.getRandomEmoji());

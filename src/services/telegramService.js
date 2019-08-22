@@ -5,7 +5,6 @@ const chatService = require('./chatService');
 const mediaService = require('./mediaService');
 const emojiService = require('./emojiService');
 const util = require('./utilService');
-const models = require('../models');
 const constants = require('../constants');
 const statusTypes = {
     typing: 'typing',
@@ -18,7 +17,7 @@ const statusTypes = {
 };
 
 const flattenRequestBody = (body = {}) => {
-    let action, data, text;
+    let action, data, text, replyMessageId;
 
     if (body.message) {
         action = 'message';
@@ -28,7 +27,13 @@ const flattenRequestBody = (body = {}) => {
     else if (body.callback_query) {
         action = 'callback';
         data = body.callback_query.message;
-        text = body.callback_query.data;
+        try {
+            const parsed = JSON.parse(body.callback_query.data);
+            text = parsed.text;
+            replyMessageId = parsed.replyMessageId;
+        } catch {
+            text = body.callback_query.data;
+        }
     }
     else {
         throw new Error('Unknown action');
@@ -48,6 +53,7 @@ const flattenRequestBody = (body = {}) => {
         action,
         messageId: data.message_id,
         chatId: data.chat.id,
+        replyMessageId,
         command,
         params,
         text,
@@ -112,13 +118,12 @@ const sendRandomMeme = async (chatId) => {
 const createChat = async (chatId) => {
     await sendStatus(chatId, statusTypes.typing);
 
-    const chat = await models.Chat.findByPk(chatId);
+    const chat = await chatService.getChat(chatId);
     if (chat) {
         await sendText(chatId, 'О, привет! А я тебя помню)');
         await sendText(chatId, emojiService.getRandomMovingEmoji());
         return;
     }
-
     await chatService.createChat(chatId);
 
     await sendText(chatId, 'Приветик)');
@@ -131,20 +136,20 @@ const randomizeMemeUrls = async (chatId) => {
     await sendText(chatId, emojiService.emojis.OK_HAND);
 };
 
-const saveFromYoutube = async (chatId, url) => {
+const saveFromYoutube = async (chatId, messageId, url) => {
     const {title} = await ytdl.getBasicInfo(url);
 
     const text = `<a href="${url}">${title}</a>\n\nВ каком формате сохранить видос?`;
     const replyMarkup = {
         inline_keyboard: [[
-            { text: 'Аудио', callback_data: `/audio ${url}` },
-            { text: 'Видео', callback_data: `/video ${url}` },
+            { text: 'Аудио', callback_data: JSON.stringify({ text: `/audio ${url}`, replyMessageId: messageId }) },
+            { text: 'Видео', callback_data: JSON.stringify({ text: `/video ${url}`, replyMessageId: messageId }) },
         ]],
     };
     await sendText(chatId, text, replyMarkup);
 };
 
-const sendVideo = async (chatId, url) => {
+const sendVideo = async (chatId, url, replyMessageId) => {
     await sendStatus(chatId, statusTypes.uploadVideo);
 
     const filePath = await mediaService.fetchVideo(url);
@@ -152,8 +157,9 @@ const sendVideo = async (chatId, url) => {
     const form = new FormData();
     form.append('chat_id', chatId);
     form.append('video', fs.createReadStream(filePath));
-    form.append('parse_mode', 'HTML');
-    form.append('caption', `<a href="${url}">${filePath.split('/').pop().replace(/\..+$/i, '')}</a>`);
+    if (replyMessageId) {
+        form.append('reply_to_message_id', replyMessageId);
+    }
 
     const options = {
         method: 'POST',
@@ -164,7 +170,7 @@ const sendVideo = async (chatId, url) => {
     await mediaService.deleteFile(filePath);
 };
 
-const sendAudio = async (chatId, url) => {
+const sendAudio = async (chatId, url, replyMessageId) => {
     await sendStatus(chatId, statusTypes.uploadAudio);
 
     const filePath = await mediaService.extractAudio(url);
@@ -172,8 +178,12 @@ const sendAudio = async (chatId, url) => {
     const form = new FormData();
     form.append('chat_id', chatId);
     form.append('audio', fs.createReadStream(filePath));
-    form.append('parse_mode', 'HTML');
-    form.append('caption', `<a href="${url}">${filePath.split('/').pop().replace(/\..+$/i, '')}</a>`);
+    const { title, performer } = util.getAudioMetadata(filePath);
+    form.append('title', title);
+    form.append('performer', performer);
+    if (replyMessageId) {
+        form.append('reply_to_message_id', replyMessageId);
+    }
 
     const options = {
         method: 'POST',
