@@ -214,7 +214,7 @@ const setReminder = async (chatId) => {
         },
         body: JSON.stringify({
             chat_id: chatId,
-            game_short_name: constants.telegramGame,
+            game_short_name: constants.gameName,
             reply_markup: {
                 inline_keyboard: [[ { text: 'Открыть', callback_data: '/game' } ]],
             },
