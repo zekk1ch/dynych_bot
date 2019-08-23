@@ -1,6 +1,6 @@
 const util = require('./utilService');
 const masterService = require('./masterService');
-const models = require('../models');
+const models = require('../index');
 
 const getChat = (id) => models.Chat.findByPk(id);
 

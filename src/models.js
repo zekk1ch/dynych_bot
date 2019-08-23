@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const constants = require('../constants');
+const constants = require('./constants');
 const sequelize = global.sequelize;
 const schemasDir = path.join(constants.rootPath, 'src', 'schemas');
 
@@ -15,8 +15,6 @@ const models = fs
 
 Object.keys(models).forEach((modelName) => {
     if (models[modelName].associate) {
-        console.log('inside acsociate');
-        console.log(models[modelName].associate);
         models[modelName].associate(models);
     }
 });

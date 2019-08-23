@@ -1,4 +1,4 @@
-const models = require('../models');
+const models = require('../index');
 const constants = require('../constants');
 
 const getMasterMemeUrls = async () => {

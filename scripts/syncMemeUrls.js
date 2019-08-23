@@ -3,7 +3,7 @@ const env = require('../env');
 global.sequelize = new Sequelize(env.DATABASE_URL);
 const memeService = require('../src/services/memeService');
 const util = require('../src/services/utilService');
-const models = require('../src/models');
+const models = require('../src');
 const constants = require('../src/constants');
 
 (async () => {
