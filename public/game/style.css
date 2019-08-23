@@ -25,37 +25,36 @@ body {
     margin: 0 auto;
 }
 
-#title-container {
-    justify-content: center;
-    margin: 20px 0 40px;
-    background-color: aquamarine;
-}
-#title-container #title {
-    font-size: 24px;
-}
-
 #date-container {
-    margin-bottom: 20px;
+    margin: 4% 0 30px;
     min-height: 60px;
     background-color: lightskyblue;
 }
 
 #note-container {
-    margin-bottom: 20px;
-    background-color: palevioletred;
+    margin-bottom: 14px;
 }
 #note {
-    resize: vertical;
-    /*min-height: 100%;*/
-    max-height: 100%;
+    resize: none;
+    min-height: 100px;
+    max-height: 80vh;
+    padding: 10px;
 }
 
 #buttons-container {
     justify-content: flex-end;
     margin-bottom: 20px;
-    background-color: yellowgreen;
 }
 
 #buttons-container #add-note {
-    margin: 6px 20px 6px 0;
+    margin: 6px 12px 6px 0;
+    padding: 8px 20px;
+    border: 1px solid #cdcdcd;
+    border-radius: 6px;
+    background-color: #dddddd;
+    color: #66628a;
+    font-size: 20px;
+}
+#buttons-container #add-note:disabled {
+    opacity: .6;
 }
