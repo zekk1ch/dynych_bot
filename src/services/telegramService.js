@@ -28,12 +28,17 @@ const flattenRequestBody = (body = {}) => {
         action = 'callback';
         data = body.callback_query.message;
         callbackId = body.callback_query.id;
-        try {
-            const { t, r } = JSON.parse(body.callback_query.data);
-            text = `${t} ${data.entities[0].url}`;
-            replyMessageId = r;
-        } catch {
-            text = body.callback_query.data;
+        if (body.callback_query.data) {
+            try {
+                const { t, r } = JSON.parse(body.callback_query.data);
+                text = `${t} ${data.entities[0].url}`;
+                replyMessageId = r;
+            } catch {
+                text = body.callback_query.data;
+            }
+        }
+        else if (body.callback_query.game_short_name) {
+            text = '/game';
         }
     }
     else {
@@ -201,6 +206,37 @@ const sendAudio = async (chatId, url, { callbackId, replyMessageId } = {}) => {
     ]);
 };
 
+const setReminder = async (chatId) => {
+    const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            chat_id: chatId,
+            game_short_name: constants.telegramGame,
+            reply_markup: {
+                inline_keyboard: [[ { text: 'Открыть', callback_data: '/game' } ]],
+            },
+        }),
+    };
+    await util.makeRequest(constants.telegramUrl + '/sendGame', options);
+};
+
+const sendGame = async (callbackId) => {
+    const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            callback_query_id: callbackId,
+            url: constants.gameUrl,
+        }),
+    };
+    await util.makeRequest(constants.telegramUrl + '/answerCallbackQuery', options);
+};
+
 const wrapSendStatus = (status, func) => async (chatId, ...args) => {
     await sendStatus(chatId, status);
     const intervalId = setInterval(() => sendStatus(chatId, status), 5000);
@@ -223,4 +259,6 @@ module.exports = {
     saveFromYoutube: wrapSendStatus(statusTypes.typing, saveFromYoutube),
     sendVideo: wrapSendStatus(statusTypes.uploadAudio, sendVideo),
     sendAudio: wrapSendStatus(statusTypes.uploadAudio, sendAudio),
+    setReminder: wrapSendStatus(statusTypes.typing, setReminder),
+    sendGame,
 };
