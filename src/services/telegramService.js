@@ -216,7 +216,7 @@ const setReminder = async (chatId) => {
             chat_id: chatId,
             game_short_name: constants.gameName,
             reply_markup: {
-                inline_keyboard: [[ { text: 'Открыть', callback_data: '/game' } ]],
+                inline_keyboard: [[ { text: 'Открыть', callback_game: 'ASDF' } ]],
             },
         }),
     };
