@@ -6,6 +6,7 @@
     "scripts": {
         "start": "node scripts/startServer.js",
         "dev": "nodemon scripts/startServer.js",
+        "sync": "browser-sync start --c browser-sync.config.js",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "repository": {
@@ -29,6 +30,7 @@
         "ytdl-core": "^0.29.5"
     },
     "devDependencies": {
+        "browser-sync": "^2.26.7",
         "nodemon": "^1.19.1"
     },
     "engines": {

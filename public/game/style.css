@@ -1,3 +1,61 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+html,
+body,
+#main {
+    height: 100%;
+}
 body {
-    color: purple;
+    background-color: #78878f30;
+    font-family: 'Lucida Sans Unicode', 'Lucida Grande', sans-serif;
+}
+
+.container {
+    display: flex;
+    width: 100%;
+}
+
+#main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 80%;
+    margin: 0 auto;
+}
+
+#title-container {
+    justify-content: center;
+    margin: 20px 0 40px;
+    background-color: aquamarine;
+}
+#title-container #title {
+    font-size: 24px;
+}
+
+#date-container {
+    margin-bottom: 20px;
+    min-height: 60px;
+    background-color: lightskyblue;
+}
+
+#note-container {
+    margin-bottom: 20px;
+    background-color: palevioletred;
+}
+#note {
+    resize: vertical;
+    /*min-height: 100%;*/
+    max-height: 100%;
+}
+
+#buttons-container {
+    justify-content: flex-end;
+    margin-bottom: 20px;
+    background-color: yellowgreen;
+}
+
+#buttons-container #add-note {
+    margin: 6px 20px 6px 0;
 }
