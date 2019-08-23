@@ -9,7 +9,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(loggers.requestLogger);
 
-app.use(express.static('public', { extensions: [ 'html' ] }));
+app.use(express.static('public'));
 app.use('/', router);
 app.use('/*', (req, res) => res.status(404).send(`Route "${req.method} ${req.originalUrl}" is not supported`));
 
