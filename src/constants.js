@@ -12,4 +12,7 @@ module.exports = {
     masterTypes: {
         MEME_URLS: 'MEME_URLS',
     },
+    ms: {
+        hour: 1000 * 60 * 60,
+    },
 };

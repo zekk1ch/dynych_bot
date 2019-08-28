@@ -1,6 +1,6 @@
 const requestLogger = (req, res, next) => {
     let info = '\n\n';
-    info += `${req.method} ${req.originalUrl} from ${req.headers['x-forwarded-for'] || req.connection.remoteAddress}`;
+    info += `${req.method} ${req.originalUrl}`;
     if (Object.entries(req.body).length) {
         info += '\nbody:\n%o';
         info += '\n\n';

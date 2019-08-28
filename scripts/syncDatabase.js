@@ -1,7 +1,7 @@
 const env = require('../env');
 const Sequelize = require('sequelize');
 global.sequelize = new Sequelize(env.DATABASE_URL);
-const models = require('../src');
+const models = require('../src/models');
 
 (async () => {
     // await sequelize.sync({ force: true });

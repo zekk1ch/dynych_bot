@@ -12,6 +12,29 @@ body {
     font-family: 'Lucida Sans Unicode', 'Lucida Grande', sans-serif;
 }
 
+#overlay-spinner {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    background-color: rgba(11, 18, 41, 0.45);
+    padding: 0 auto;
+}
+#overlay-spinner i {
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    transform: translateX(-50%);
+    animation-duration: 1.6s;
+    font-size: 70px;
+    color: #dedfeb;
+    transition: color 0.5s ease-out;
+}
+#overlay-spinner i:hover {
+    color: white;
+    transition: color 0.5s ease-out;
+}
+
 .container {
     display: flex;
     width: 100%;
@@ -26,35 +49,105 @@ body {
 }
 
 #date-container {
-    margin: 4% 0 30px;
-    min-height: 60px;
-    background-color: lightskyblue;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 24px 0 30px;
+}
+#date-picker {
+    margin-bottom: 10px;
 }
 
 #note-container {
+    flex-direction: column;
     margin-bottom: 14px;
 }
 #note {
-    resize: none;
-    min-height: 100px;
-    max-height: 80vh;
-    padding: 10px;
+    min-height: 108px;
+    max-height: 54vh;
+    word-wrap: break-word;
+    overflow: auto;
+    padding: 8px 12px;
+    background-color: #f9f9f9;
+    border: 1px solid #c7c7c7;
+    border-radius: 4px;
+    outline-color: #83bdff;
+}
+#note:empty:not(:focus):before {
+    color: grey;
+    font-size: 15px;
+    content: attr(data-text);
 }
 
 #buttons-container {
-    justify-content: flex-end;
+    flex-direction: column;
     margin-bottom: 20px;
 }
-
-#buttons-container #add-note {
-    margin: 6px 12px 6px 0;
+#add-note {
+    margin-top: 6px;
     padding: 8px 20px;
     border: 1px solid #cdcdcd;
     border-radius: 6px;
     background-color: #dddddd;
     color: #66628a;
     font-size: 20px;
+    transition: opacity 0.2s ease-out, background-color 0.3s ease-out;
+    outline: 0;
 }
-#buttons-container #add-note:disabled {
-    opacity: .6;
+#add-note:disabled {
+    cursor: auto;
+    opacity: .3;
+    transition: opacity 0.35s ease-in 0.1s;
+}
+#add-note:hover:not(:disabled) {
+    cursor: pointer;
+    background-color: #e3e3e3;
+    transition: background-color 0.3s ease-out;
+}
+
+.picker {
+    /*outline: 0;*/
+    border: 1px solid #dbdbdb;
+    border-radius: 10px;
+    overflow: hidden;
+}
+.picker .picker-item.picker-picked {
+    padding: 0;
+    line-height: 16px;
+    height: 16px;
+}
+.picker .picker-cell__header {
+    padding: 3px 0 0;
+    line-height: 16px;
+}
+.picker .picker-cell__control {
+    height: 12px;
+    padding: 0;
+}
+.picker .picker-cell__control--prev { margin: 6px 0 -3px; }
+.picker .picker-cell__control--next { margin: -6px 0 7px; }
+
+@media (min-width: 600px) {
+    #date-container {
+        flex-direction: row;
+        justify-content: space-around;
+    }
+    #buttons-container {
+        flex-direction: row;
+        justify-content: flex-end;
+    }
+    #add-note {
+        min-width: 180px;
+        margin-right: 4%;
+    }
+    #date-picker {
+        max-width: 450px;
+    }
+    #time-picker {
+        max-width: 300px;
+    }
+    #date-picker {
+        margin-bottom: 0;
+        margin-right: 30px;
+    }
 }

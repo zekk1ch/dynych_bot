@@ -100,6 +100,11 @@ const sendText = async (chatId, text, replyMarkup) => {
     await util.makeRequest(constants.telegramUrl + '/sendMessage', options);
 };
 
+const sendReminder = async (chatId, text) => {
+    const reminderText = `${emojiService.emojis.CHECK_MARK}<b> ${text}</b>`;
+    await sendText(chatId, reminderText);
+};
+
 const sendRandomMeme = async (chatId) => {
     const url = await chatService.getMemeUrl(chatId);
     const filePath = await mediaService.fetchImage(url);
@@ -223,7 +228,7 @@ const setReminder = async (chatId) => {
     await util.makeRequest(constants.telegramUrl + '/sendGame', options);
 };
 
-const sendGame = async (callbackId) => {
+const sendGame = async (chatId, callbackId) => {
     const options = {
         method: 'POST',
         headers: {
@@ -231,7 +236,7 @@ const sendGame = async (callbackId) => {
         },
         body: JSON.stringify({
             callback_query_id: callbackId,
-            url: constants.gameUrl,
+            url: `${constants.gameUrl}/${chatId}`,
         }),
     };
     await util.makeRequest(constants.telegramUrl + '/answerCallbackQuery', options);
@@ -260,5 +265,6 @@ module.exports = {
     sendVideo: wrapSendStatus(statusTypes.uploadAudio, sendVideo),
     sendAudio: wrapSendStatus(statusTypes.uploadAudio, sendAudio),
     setReminder: wrapSendStatus(statusTypes.typing, setReminder),
+    sendReminder: wrapSendStatus(statusTypes.typing, sendReminder),
     sendGame,
 };

@@ -1,6 +1,6 @@
 const express = require('express');
-const telegramService = require('./services/telegramService');
-const emojiService = require('./services/emojiService');
+const telegramService = require('../services/telegramService');
+const emojiService = require('../services/emojiService');
 const router = express.Router();
 
 router.use((req, res, next) => {
