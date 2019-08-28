@@ -23,7 +23,7 @@ const reset = () => {
 
 const submitNote = async (text, date) => {
     const options = {
-        method: 'GET',
+        method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
