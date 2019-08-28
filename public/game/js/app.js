@@ -52,7 +52,7 @@ export const handleAddNoteClick = async () => {
         const text = elements.note.innerText;
         const [year, month, day] = elements.datePicker.getDate('YYYY-MM-DD').split('-');
         const [hour, minute] = elements.timePicker.getDate('HH:mm').split(':');
-        const date = Date.UTC(year, month, day, hour, minute);
+        const date = new Date(year, month - 1, day, hour, minute).getTime();
 
         const res = await submitNote(text, date);
         console.log(res);

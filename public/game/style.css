@@ -106,7 +106,7 @@ body {
 }
 
 .picker {
-    /*outline: 0;*/
+    outline: 0;
     border: 1px solid #dbdbdb;
     border-radius: 10px;
     overflow: hidden;
@@ -123,6 +123,9 @@ body {
 .picker .picker-cell__control {
     height: 12px;
     padding: 0;
+}
+.picker .picker-cell__control:before {
+    transition: border-color 0.1s ease-out;
 }
 .picker .picker-cell__control--prev { margin: 6px 0 -3px; }
 .picker .picker-cell__control--next { margin: -6px 0 7px; }
