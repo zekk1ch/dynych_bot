@@ -45,7 +45,7 @@ router.post('/', async (req, res) => {
                 await telegramService.setReminder(chatId);
                 break;
             case '/game':
-                await telegramService.sendGame(callbackId);
+                await telegramService.sendGame(chatId, callbackId);
                 break;
             default:
                 await telegramService.sendText(chatId, emojiService.getRandomEmoji(emojiService.facepalmEmojis));
