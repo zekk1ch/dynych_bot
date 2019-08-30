@@ -42,6 +42,9 @@ body {
     display: flex;
     width: 100%;
 }
+.crossed {
+    text-decoration: line-through;
+}
 .error {
     color: #f22223;
     font-size: 14px;
@@ -78,11 +81,43 @@ body {
 #date-container {
     display: flex;
     flex-direction: column;
+}
+#date-controls {
+    display: flex;
+    margin: 10px 20px 2px;
+}
+.date-control {
+    display: flex;
+    margin-right: 8%;
+}
+.date-control:last-of-type {
+    margin-right: 0;
+}
+.date-control label {
+    margin: -3px 4px 0 0;
+}
+#date {
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    margin-top: 24px;
 }
 #date-picker {
     margin-bottom: 10px;
+}
+#date-picker,
+#time-picker {
+    opacity: 1;
+    max-height: 1000px;
+    max-width: 1000px;
+    transition: opacity 0.6s ease-in, max-height 6s ease-out;
+}
+#date-picker.hidden,
+#time-picker.hidden {
+    margin: 0;
+    opacity: 0;
+    max-height: 0;
+    max-width: 0;
+    transition: opacity 0.5s ease-out, max-height 2.5s ease-out -0.8s, max-width 0s linear 3s;
 }
 
 #note-container {
@@ -96,6 +131,7 @@ body {
     padding: 8px 12px;
     border: 1px solid #c7c7c7;
     border-radius: 4px;
+    transition: min-height 0.4s;
 }
 #note:empty:not(:focus):before {
     color: #9299a5;
@@ -162,9 +198,9 @@ body {
 
 @media (min-width: 600px) {
     #overlay-spinner i { left: 46%; }
-    #date-container {
+    #date {
         flex-direction: row;
-        justify-content: space-around;
+        justify-content: center;
     }
     #note {
         max-height: 53vh;
@@ -186,6 +222,14 @@ body {
     #date-picker {
         margin-bottom: 0;
         margin-right: 30px;
+    }
+    #date-picker,
+    #time-picker {
+        transition: opacity 0.6s ease-in, max-height 3s, max-width 1s ease-out;
+    }
+    #date-picker.hidden,
+    #time-picker.hidden {
+        transition: opacity 0.5s ease-out 0.2s, max-height 1s, max-width 1s ease-in -0.1s;
     }
 }
 @media (min-height: 600px) {

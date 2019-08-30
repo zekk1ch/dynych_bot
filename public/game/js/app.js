@@ -109,3 +109,30 @@ export const handleNoteInput = () => {
         }
     }
 };
+
+export const handleDateControlChange = (type) => {
+    let control, label, picker;
+
+    switch (type) {
+        case 'date':
+            control = elements.showDatePicker;
+            label = elements.showDatePickerLabel;
+            picker = elements.datePicker;
+            break;
+        case 'time':
+            control = elements.showTimePicker;
+            label = elements.showTimePickerLabel;
+            picker = elements.timePicker;
+            break;
+        default:
+            throw new Error(`Unknown date control – "${type}"`);
+    }
+
+    if (control.checked) {
+        label.classList.remove('crossed');
+        picker.classList.remove('hidden');
+    } else {
+        label.classList.add('crossed');
+        picker.classList.add('hidden');
+    }
+};

@@ -14,7 +14,13 @@ export const addNoteBtn = document.querySelector('#add-note');
 export const spinner = document.querySelector('#overlay-spinner');
 export const error = document.querySelector('#error');
 export const dateError = document.querySelector('#date-error');
-const datePicker = new Picker(document.querySelector('#date-picker'), {
+export const showDatePicker = document.querySelector('#show-date-picker');
+export const showDatePickerLabel = document.querySelector('label[for="show-date-picker"]');
+export const showTimePicker = document.querySelector('#show-time-picker');
+export const showTimePickerLabel = document.querySelector('label[for="show-time-picker"]');
+export const datePicker = document.querySelector('#date-picker');
+export const timePicker = document.querySelector('#time-picker');
+const DatePicker = new Picker(datePicker, {
     format: 'YYYY-MMMM-DD',
     headers: true,
     controls: !isMobile,
@@ -27,7 +33,7 @@ const datePicker = new Picker(document.querySelector('#date-picker'), {
     },
     months: monthNames,
 });
-const timePicker = new Picker(document.querySelector('#time-picker'), {
+const TimePicker = new Picker(timePicker, {
     format: 'HH:mm',
     headers: true,
     controls: !isMobile,
@@ -40,8 +46,8 @@ const timePicker = new Picker(document.querySelector('#time-picker'), {
 });
 export const date = {
     get: () => {
-        const [year, month, day] = datePicker.getDate('YYYY-MMM-DD').split('-');
-        const [hour, minute] = timePicker.getDate('HH:mm').split(':');
+        const [year, month, day] = DatePicker.getDate('YYYY-MMM-DD').split('-');
+        const [hour, minute] = TimePicker.getDate('HH:mm').split(':');
         const date = new Date(year, months[month].index, day, hour, minute).getTime();
 
         let now = Date.now();
@@ -54,7 +60,7 @@ export const date = {
     },
     reset: () => {
         const now = new Date();
-        datePicker.setDate(now);
-        timePicker.setDate(now);
+        DatePicker.setDate(now);
+        TimePicker.setDate(now);
     },
 };

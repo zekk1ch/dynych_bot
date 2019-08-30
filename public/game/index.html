@@ -14,8 +14,20 @@
 </div>
 <div id="main" class="container">
     <div id="date-container" class="container">
-        <div id="date-picker"></div>
-        <div id="time-picker"></div>
+        <div id="date-controls">
+            <div class="date-control">
+                <label for="show-date-picker" class="crossed">Дата</label>
+                <div><input id="show-date-picker" type="checkbox"/></div>
+            </div>
+            <div class="date-control">
+                <label for="show-time-picker" class="crossed">Время</label>
+                <div><input id="show-time-picker" type="checkbox"/></div>
+            </div>
+        </div>
+        <div id="date">
+            <div id="date-picker" class="hidden"></div>
+            <div id="time-picker" class="hidden"></div>
+        </div>
     </div>
     <div id="note-container" class="container">
         <div id="date-error" class="error empty"></div>
