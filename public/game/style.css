@@ -84,6 +84,7 @@ body {
 }
 #date-controls {
     display: flex;
+    align-items: center;
     margin: 10px 20px 2px;
 }
 .date-control {
@@ -100,7 +101,6 @@ body {
     color: #57637d;
     max-width: 200px;
     overflow: hidden;
-    white-space: nowrap;
     transition: max-width 1s ease-in 0.3s;
 }
 #date-selected.empty {
@@ -223,6 +223,9 @@ body {
     #add-note {
         min-width: 180px;
         margin-right: 4%;
+    }
+    #date-selected {
+        white-space: nowrap;
     }
     #date-picker {
         max-width: 450px;
