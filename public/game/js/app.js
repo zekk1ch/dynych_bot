@@ -37,7 +37,6 @@ const showSuccess = () => {
 };
 
 const reset = () => {
-    elements.note.focus();
     elements.note.innerText = '';
     elements.error.classList.add('empty');
     elements.dateError.classList.add('empty');
