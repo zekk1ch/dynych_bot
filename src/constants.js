@@ -13,6 +13,7 @@ module.exports = {
         MEME_URLS: 'MEME_URLS',
     },
     ms: {
+        minute: 1000 * 60,
         hour: 1000 * 60 * 60,
     },
 };

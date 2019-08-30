@@ -10,18 +10,20 @@ const enhanceReminder = (reminder) => ({
 
 const validate = (reminder) => {
     if (!reminder.text || typeof reminder.text !== 'string') {
-        throw new Error('Reminder text is required');
+        throw new Error('text: Текст напоминания обязателен');
     }
     if (!reminder.date) {
-        throw new Error('Reminder date is required');
+        throw new Error('date: Дата не указана');
     }
 
     const date = Number(reminder.date);
     if (isNaN(date) || date.toString().length !== 13) {
-        throw new Error('Reminder date is invalid');
+        throw new Error('date: Неправильная дата');
     }
-    if (Date.now() > date) {
-        throw new Error('Reminder date is expired');
+    let now = Date.now();
+    now = now - now % constants.ms.minute;
+    if (now > date) {
+        throw new Error('date: Дата уже прошла');
     }
 };
 
@@ -58,9 +60,12 @@ const sendReminderAfterTimeout = (reminder, sendReminder, chatId) => {
 };
 
 const saveReminder = async ({ chatId, ...reminder }, sendReminder) => {
+    if (isNaN(Number(chatId))) {
+        throw new Error(`Неправильный формат ID чата – "${chatId}"`);
+    }
     const chat = await models.Chat.scope('reminder').findByPk(chatId);
     if (!chat) {
-        throw new Error('The requested chat doesn\'t exist');
+        throw new Error(`Чат с указанным ID не существует – "${chatId}"`);
     }
 
     validate(reminder);

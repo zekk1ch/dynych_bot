@@ -1,24 +1,50 @@
 import * as elements from './elements.js';
-
 const chatId = window.location.pathname.split('/')[2];
 
-export const handleNoteInput = () => {
-    if (elements.note.innerText === '') {
-        if (!elements.addNoteBtn.disabled) {
-            elements.addNoteBtn.disabled = true;
-        }
-    } else {
-        if (elements.addNoteBtn.disabled) {
-            elements.addNoteBtn.disabled = false;
-        }
+let errorTimeoutId;
+const showError = (err) => {
+    if (errorTimeoutId) {
+        clearTimeout(errorTimeoutId);
     }
+
+    const { groups: { field, message } } = err.message.trim().match(/^(?<field>text|date)[-: ]+(?<message>.+)$/i) || { groups: {} };
+
+    switch (field) {
+        case 'text':
+            elements.error.innerText = message;
+            elements.error.classList.remove('empty');
+            break;
+        case 'date':
+            elements.dateError.innerText = message;
+            elements.dateError.classList.remove('empty');
+            break;
+        default:
+            elements.error.innerText = err.message || 'Ошибка сервера...';
+            elements.error.classList.remove('empty');
+    }
+
+    errorTimeoutId = setTimeout(() => {
+        elements.error.classList.add('empty');
+        elements.dateError.classList.add('empty');
+    }, 2000);
+};
+
+const showSuccess = () => {
+    elements.note.classList.add('success');
+    setTimeout(() => {
+        elements.note.classList.remove('success');
+    }, 1000);
 };
 
 const reset = () => {
+    elements.note.focus();
     elements.note.innerText = '';
+    elements.error.classList.add('empty');
+    elements.dateError.classList.add('empty');
+    if (errorTimeoutId) {
+        clearTimeout(errorTimeoutId);
+    }
     elements.addNoteBtn.disabled = true;
-    elements.datePicker.reset();
-    elements.timePicker.reset();
 };
 
 const submitNote = async (text, date) => {
@@ -44,23 +70,43 @@ const submitNote = async (text, date) => {
     }
 };
 
-// TODO: display response
 export const handleAddNoteClick = async () => {
-    elements.spinner.hidden = false;
-
     try {
+        const date = elements.date.get();
         const text = elements.note.innerText;
-        const [year, month, day] = elements.datePicker.getDate('YYYY-MM-DD').split('-');
-        const [hour, minute] = elements.timePicker.getDate('HH:mm').split(':');
-        const date = new Date(year, month - 1, day, hour, minute).getTime();
 
-        const res = await submitNote(text, date);
-        console.log(res);
+        elements.error.innerText = '';
+        elements.dateError.innerText = '';
+        elements.spinner.hidden = false;
+
+        await submitNote(text, date);
 
         reset();
+        showSuccess();
     } catch (err) {
         console.error(err);
-    } finally {
-        elements.spinner.hidden = true;
+        showError(err);
+    }
+    elements.spinner.hidden = true;
+};
+
+export const handleNoteKeydown = (e) => {
+    if (e.keyCode === 13 && e.shiftKey) {
+        e.preventDefault();
+        if (elements.note.innerText) {
+            handleAddNoteClick();
+        }
+    }
+};
+
+export const handleNoteInput = () => {
+    if (elements.note.innerText.trim()) {
+        if (elements.addNoteBtn.disabled) {
+            elements.addNoteBtn.disabled = false;
+        }
+    } else {
+        if (!elements.addNoteBtn.disabled) {
+            elements.addNoteBtn.disabled = true;
+        }
     }
 };

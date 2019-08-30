@@ -18,10 +18,15 @@
         <div id="time-picker"></div>
     </div>
     <div id="note-container" class="container">
-        <div id="note" contenteditable data-text="Enter text here..."></div>
+        <div id="date-error" class="error empty"></div>
+        <div id="note" class="textarea" contenteditable data-placeholder="Введи текст заметки..."></div>
+        <div id="error" class="error empty"></div>
     </div>
     <div id="buttons-container" class="container">
-        <button id="add-note" disabled>Add</button>
+        <button id="add-note" disabled>
+            <i class="fas fa-check"></i>
+            Напомнить
+        </button>
     </div>
 </div>
 <script src="js/index.js" type="module"></script>

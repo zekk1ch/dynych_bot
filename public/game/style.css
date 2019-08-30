@@ -1,6 +1,10 @@
 * {
     margin: 0;
     padding: 0;
+    outline: 0;
+}
+* :focus {
+    box-shadow: 0 0 2pt 0.5pt #9cd2ff;
 }
 html,
 body,
@@ -22,9 +26,8 @@ body {
 }
 #overlay-spinner i {
     position: absolute;
-    top: 30%;
-    left: 50%;
-    transform: translateX(-50%);
+    top: 26%;
+    left: 42%;
     animation-duration: 1.6s;
     font-size: 70px;
     color: #dedfeb;
@@ -39,6 +42,30 @@ body {
     display: flex;
     width: 100%;
 }
+.error {
+    color: #f22223;
+    font-size: 14px;
+    font-style: italic;
+    text-align: right;
+    margin: 3px 8px 0;
+    max-height: 400px;
+    opacity: 1;
+    transition: max-height 4s, opacity 0.3s ease-out;
+}
+.error.empty {
+    max-height: 0;
+    opacity: 0;
+    transition: max-height 2s, opacity 0.5s ease-in 1s;
+}
+.textarea {
+    background-color: #f4f4f4;
+    transition: background-color 0.4s ease-in 0.1s, box-shadow 0.4s ease-in 0.1s;
+}
+.success {
+    box-shadow: 0 0 6pt 1px rgba(63, 255, 0, 0.72);
+    background-color: #f8fffc;
+    transition: background-color 0.15s ease-out, box-shadow 0.15s ease-out;
+}
 
 #main {
     display: flex;
@@ -52,7 +79,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin: 24px 0 30px;
+    margin-top: 24px;
 }
 #date-picker {
     margin-bottom: 10px;
@@ -60,24 +87,23 @@ body {
 
 #note-container {
     flex-direction: column;
-    margin-bottom: 14px;
 }
 #note {
-    min-height: 108px;
-    max-height: 54vh;
+    min-height: 58px;
+    max-height: 28vh;
     word-wrap: break-word;
     overflow: auto;
     padding: 8px 12px;
-    background-color: #f9f9f9;
     border: 1px solid #c7c7c7;
     border-radius: 4px;
-    outline-color: #83bdff;
 }
 #note:empty:not(:focus):before {
-    color: grey;
+    color: #9299a5;
     font-size: 15px;
-    content: attr(data-text);
+    content: attr(data-placeholder);
 }
+#date-error { margin-bottom: 14px; }
+#error { margin-bottom: 8px; }
 
 #buttons-container {
     flex-direction: column;
@@ -85,19 +111,18 @@ body {
 }
 #add-note {
     margin-top: 6px;
-    padding: 8px 20px;
+    padding: 8px 2px;
     border: 1px solid #cdcdcd;
-    border-radius: 6px;
+    border-radius: 7px;
     background-color: #dddddd;
-    color: #66628a;
+    color: #5b6983;
     font-size: 20px;
     transition: opacity 0.2s ease-out, background-color 0.3s ease-out;
-    outline: 0;
 }
 #add-note:disabled {
     cursor: auto;
     opacity: .3;
-    transition: opacity 0.35s ease-in 0.1s;
+    transition: opacity 0.25s ease-out;
 }
 #add-note:hover:not(:disabled) {
     cursor: pointer;
@@ -106,15 +131,20 @@ body {
 }
 
 .picker {
-    outline: 0;
     border: 1px solid #dbdbdb;
     border-radius: 10px;
     overflow: hidden;
 }
+.picker .picker-item {
+    line-height: 46px;
+    height: 15px;
+    transition: color 0.2s ease-out;
+}
 .picker .picker-item.picker-picked {
-    padding: 0;
-    line-height: 16px;
-    height: 16px;
+    font-size: 20px;
+}
+.picker .picker-cell__body {
+    height: 84px;
 }
 .picker .picker-cell__header {
     padding: 3px 0 0;
@@ -131,9 +161,13 @@ body {
 .picker .picker-cell__control--next { margin: -6px 0 7px; }
 
 @media (min-width: 600px) {
+    #overlay-spinner i { left: 46%; }
     #date-container {
         flex-direction: row;
         justify-content: space-around;
+    }
+    #note {
+        max-height: 53vh;
     }
     #buttons-container {
         flex-direction: row;
@@ -152,5 +186,10 @@ body {
     #date-picker {
         margin-bottom: 0;
         margin-right: 30px;
+    }
+}
+@media (min-height: 600px) {
+    #note {
+        min-height: 162px;
     }
 }
