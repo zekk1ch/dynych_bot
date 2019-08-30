@@ -18,6 +18,7 @@ export const showDatePicker = document.querySelector('#show-date-picker');
 export const showDatePickerLabel = document.querySelector('label[for="show-date-picker"]');
 export const showTimePicker = document.querySelector('#show-time-picker');
 export const showTimePickerLabel = document.querySelector('label[for="show-time-picker"]');
+export const selectedDate = document.querySelector('#date-selected');
 export const datePicker = document.querySelector('#date-picker');
 export const timePicker = document.querySelector('#time-picker');
 const DatePicker = new Picker(datePicker, {
@@ -57,6 +58,11 @@ export const date = {
         }
 
         return date;
+    },
+    getDate: () => {
+        const [year, month, day] = DatePicker.getDate('YYYY-MMM-DD').split('-');
+        const [hour, minute] = TimePicker.getDate('HH:mm').split(':');
+        return new Date(year, months[month].index, day, hour, minute);
     },
     reset: () => {
         const now = new Date();

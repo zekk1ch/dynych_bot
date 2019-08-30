@@ -110,6 +110,12 @@ export const handleNoteInput = () => {
     }
 };
 
+export const updateSelectedDate = () => {
+    const date = elements.date.getDate();
+    elements.selectedDate.innerText = date.toLocaleString('ru');
+};
+
+let numOfPickersShown = 0;
 export const handleDateControlChange = (type) => {
     let control, label, picker;
 
@@ -131,8 +137,15 @@ export const handleDateControlChange = (type) => {
     if (control.checked) {
         label.classList.remove('crossed');
         picker.classList.remove('hidden');
+        if (numOfPickersShown++ === 0) {
+            elements.selectedDate.classList.add('empty');
+        }
     } else {
         label.classList.add('crossed');
         picker.classList.add('hidden');
+        updateSelectedDate();
+        if (numOfPickersShown-- === 1) {
+            elements.selectedDate.classList.remove('empty');
+        }
     }
 };
