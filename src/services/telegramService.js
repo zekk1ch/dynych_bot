@@ -216,7 +216,7 @@ const sendAudio = async (chatId, url, { callbackId, replyMessageId } = {}) => {
 
     let savedFilePath;
     const file = await chatService
-        .getFileByUrl(chatId, url)
+        .getFileByUrl(chatId, url, 'mp3')
         .catch(() => null);
     if (file) {
         form.append('audio', file.id);
