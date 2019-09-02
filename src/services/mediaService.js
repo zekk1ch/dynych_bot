@@ -46,28 +46,26 @@ const fetchVideo = async (url, format = 'mp4') => {
     }
 
     try {
-        const [info, response] = await Promise.all([
+        const [info, file] = await Promise.all([
             ytdl.getBasicInfo(url),
             ytdl(url, { format }),
         ]);
 
-        const promises = [
-            saveFile(`${info.title}.${format}`, response),
-        ];
-        if (format === 'mp4') {
-            promises.push(fetchImage(info.player_response.videoDetails.thumbnail.thumbnails[2].url, `${info.title}.thumbnail.jpeg`));
-        }
-
-        const [filePath, thumbnailPath] = await Promise.all(promises);
-        return { filePath, thumbnailPath };
+        return await saveFile(`${info.title}.${format}`, file);
     } catch (err) {
         console.error(err);
         throw new Error(`Failed to fetch video from ${url}`);
     }
 };
 
+const fetchThumbnail = async (url) => {
+    const info = await ytdl.getBasicInfo(url);
+    return await fetchImage(info.player_response.videoDetails.thumbnail.thumbnails[2].url);
+};
+
 module.exports = {
     fetchImage,
     fetchVideo,
     deleteFile,
+    fetchThumbnail,
 };

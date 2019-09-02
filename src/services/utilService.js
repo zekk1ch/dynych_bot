@@ -58,7 +58,7 @@ const randomizeArray = (array) => {
     return randomized;
 };
 
-const getAudioMetadata = (filePath) => {
+const getMetadata = (filePath) => {
     const delimiter = ' - ';
     let title, performer;
 
@@ -82,5 +82,5 @@ module.exports = {
     getRandomString,
     getRandomArrayItem,
     randomizeArray,
-    getAudioMetadata,
+    getMetadata,
 };

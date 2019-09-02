@@ -29,5 +29,8 @@ module.exports = (sequelize, DataTypes) => sequelize.define('Chat', {
         reminder: {
             attributes: ['id', 'reminders', 'createdAt', 'updatedAt'],
         },
+        file: {
+            attributes: ['id', 'files', 'createdAt', 'updatedAt'],
+        },
     },
 });

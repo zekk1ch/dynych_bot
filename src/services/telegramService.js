@@ -165,54 +165,90 @@ const answerCallback = (callbackId) => {
 };
 
 const sendVideo = async (chatId, url, { callbackId, replyMessageId } = {}) => {
-    const { filePath, thumbnailPath } = await mediaService.fetchVideo(url);
-
     const form = new FormData();
     form.append('chat_id', chatId);
-    form.append('video', fs.createReadStream(filePath));
-    form.append('thumb', fs.createReadStream(thumbnailPath));
     if (replyMessageId) {
         form.append('reply_to_message_id', replyMessageId);
     }
 
-    await util.makeRequest(constants.telegramUrl + '/sendVideo', { method: 'POST', body: form });
+    let savedFilePath;
+    const file = await chatService
+        .getFileByUrl(chatId, url)
+        .catch(() => null);
+    if (file) {
+        form.append('video', file.id);
+    } else {
+        const filePath = await mediaService.fetchVideo(url);
+        savedFilePath = filePath;
+        form.append('video', fs.createReadStream(filePath));
+    }
+    const thumbnailPath = await mediaService.fetchThumbnail(url);
+    form.append('thumb', fs.createReadStream(thumbnailPath));
+
+    const response = await util.makeRequest(constants.telegramUrl + '/sendVideo', { method: 'POST', body: form });
     if (callbackId) {
-        await answerCallback(callbackId);
+        await answerCallback(callbackId).catch((err) => console.error(err));
     }
 
-    await Promise.all([
-        mediaService.deleteFile(filePath),
-        mediaService.deleteFile(thumbnailPath),
-    ]);
+    const promises = [mediaService.deleteFile(thumbnailPath)];
+    if (savedFilePath) {
+        const metadata = util.getMetadata(savedFilePath);
+        promises.push(
+            chatService.saveFile(chatId, {
+                id: response.result.video.file_id,
+                url,
+                title: metadata.title,
+                performer: metadata.performer,
+                format: 'mp4',
+            }),
+            mediaService.deleteFile(savedFilePath),
+        );
+    }
+    await Promise.all(promises);
 };
 
 const sendAudio = async (chatId, url, { callbackId, replyMessageId } = {}) => {
-    const { filePath } = await mediaService.fetchVideo(url, 'mp3');
-
-
-
-    console.log(filePath);
-
-
-
     const form = new FormData();
     form.append('chat_id', chatId);
-    form.append('audio', fs.createReadStream(filePath));
-    const { title, performer } = util.getAudioMetadata(filePath);
-    form.append('title', title);
-    form.append('performer', performer);
     if (replyMessageId) {
         form.append('reply_to_message_id', replyMessageId);
     }
 
-    const response = await util.makeRequest(constants.telegramUrl + '/sendAudio', { method: 'POST', body: form });
-    console.log(response);
+    let savedFilePath;
+    const file = await chatService
+        .getFileByUrl(chatId, url)
+        .catch(() => null);
+    if (file) {
+        form.append('audio', file.id);
+        form.append('title', file.title);
+        form.append('performer', file.performer);
+    } else {
+        const filePath = await mediaService.fetchVideo(url, 'mp3');
+        savedFilePath = filePath;
+        form.append('audio', fs.createReadStream(filePath));
 
-    if (callbackId) {
-        await answerCallback(callbackId);
+        const metadata = util.getMetadata(filePath);
+        form.append('title', metadata.title);
+        form.append('performer', metadata.performer);
     }
 
-    await mediaService.deleteFile(filePath);
+    const response = await util.makeRequest(constants.telegramUrl + '/sendAudio', { method: 'POST', body: form });
+    if (callbackId) {
+        await answerCallback(callbackId).catch((err) => console.error(err));
+    }
+
+    if (savedFilePath) {
+        await Promise.all([
+            chatService.saveFile(chatId, {
+                id: response.result.audio.file_id,
+                url,
+                title: response.result.audio.title,
+                performer: response.result.audio.performer,
+                format: 'mp3',
+            }),
+            mediaService.deleteFile(savedFilePath),
+        ]);
+    }
 };
 
 const setReminder = async (chatId) => {
