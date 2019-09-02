@@ -187,12 +187,17 @@ const sendVideo = async (chatId, url, { callbackId, replyMessageId } = {}) => {
 };
 
 const sendAudio = async (chatId, url, { callbackId, replyMessageId } = {}) => {
-    const { filePath, thumbnailPath } = await mediaService.fetchVideo(url, 'mp3');
+    const { filePath } = await mediaService.fetchVideo(url, 'mp3');
+
+
+
+    console.log(filePath);
+
+
 
     const form = new FormData();
     form.append('chat_id', chatId);
     form.append('audio', fs.createReadStream(filePath));
-    form.append('thumb', fs.createReadStream(thumbnailPath));
     const { title, performer } = util.getAudioMetadata(filePath);
     form.append('title', title);
     form.append('performer', performer);
@@ -200,15 +205,14 @@ const sendAudio = async (chatId, url, { callbackId, replyMessageId } = {}) => {
         form.append('reply_to_message_id', replyMessageId);
     }
 
-    await util.makeRequest(constants.telegramUrl + '/sendAudio', { method: 'POST', body: form });
+    const response = await util.makeRequest(constants.telegramUrl + '/sendAudio', { method: 'POST', body: form });
+    console.log(response);
+
     if (callbackId) {
         await answerCallback(callbackId);
     }
 
-    await Promise.all([
-        mediaService.deleteFile(filePath),
-        mediaService.deleteFile(thumbnailPath),
-    ]);
+    await mediaService.deleteFile(filePath);
 };
 
 const setReminder = async (chatId) => {

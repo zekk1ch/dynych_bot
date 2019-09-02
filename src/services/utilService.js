@@ -1,5 +1,24 @@
 const path = require('path');
 const fetch = require('node-fetch');
+const emojiService = require('./emojiService');
+
+const explainError = (err) => {
+    let message = emojiService.emojis.GRIMACING_FACE;
+
+    if (err instanceof Error) {
+        if (err.message) {
+            message = err.message;
+        }
+    } else if (typeof err === 'object') {
+        if (err.description) {
+            message = err.description;
+        } else {
+            message = JSON.stringify(err);
+        }
+    }
+
+    return message;
+};
 
 const makeRequest = async (url, options) => {
     const response = await fetch(url, options);
@@ -8,7 +27,7 @@ const makeRequest = async (url, options) => {
     if (response.ok) {
         return data;
     } else {
-        throw new Error(JSON.stringify(data));
+        throw data;
     }
 };
 
@@ -57,6 +76,7 @@ const getAudioMetadata = (filePath) => {
 };
 
 module.exports = {
+    explainError,
     makeRequest,
     sleep,
     getRandomString,

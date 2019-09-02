@@ -1,6 +1,7 @@
 const express = require('express');
 const telegramService = require('../services/telegramService');
 const emojiService = require('../services/emojiService');
+const util = require('../services/utilService');
 const router = express.Router();
 
 router.use((req, res, next) => {
@@ -54,9 +55,10 @@ router.post('/', async (req, res) => {
         res.send('ok');
     } catch (err) {
         console.log(err);
+        const errorMessage = util.explainError(err);
 
         try {
-            await telegramService.sendText(chatId, `Ошибочка... ${emojiService.emojis.THINKING_FACE}\n\n${err.message || ''}`);
+            await telegramService.sendText(chatId, `Ошибочка... ${emojiService.emojis.THINKING_FACE}\n\n${errorMessage}`);
 
             res.send('ok ok');
         } catch {

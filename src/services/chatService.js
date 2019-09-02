@@ -24,7 +24,7 @@ const randomizeMemeUrls = async (id) => {
 const getMemeUrl = async (id) => {
     const chat = await models.Chat.findByPk(id);
     if (!chat) {
-        throw new Error(`Chat with id ${id} doesn't exist`);
+        throw new Error(`Твой чат ещё не зарегестрирован.\nНапиши мне  /start`);
     }
 
     const memeUrls = chat.get('memeUrls');

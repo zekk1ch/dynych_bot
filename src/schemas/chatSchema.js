@@ -17,6 +17,11 @@ module.exports = (sequelize, DataTypes) => sequelize.define('Chat', {
         defaultValue: [],
         allowNull: false,
     },
+    files: {
+        type: DataTypes.JSONB,
+        defaultValue: [],
+        allowNull: false,
+    },
 }, {
     tableName: 'chat',
     underscored: true,

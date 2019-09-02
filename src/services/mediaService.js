@@ -2,7 +2,6 @@ const fs = require('fs');
 const path = require('path');
 const fetch = require('node-fetch');
 const ytdl = require('ytdl-core');
-const util = require('./utilService');
 const constants = require('../constants');
 
 const saveFile = (fileName, readStream) => new Promise((resolve, reject) => {
@@ -52,11 +51,14 @@ const fetchVideo = async (url, format = 'mp4') => {
             ytdl(url, { format }),
         ]);
 
-        const [filePath, thumbnailPath] = await Promise.all([
+        const promises = [
             saveFile(`${info.title}.${format}`, response),
-            fetchImage(info.player_response.videoDetails.thumbnail.thumbnails[2].url, `${util.getRandomString()}.jpeg`),
-        ]);
+        ];
+        if (format === 'mp4') {
+            promises.push(fetchImage(info.player_response.videoDetails.thumbnail.thumbnails[2].url, `${info.title}.thumbnail.jpeg`));
+        }
 
+        const [filePath, thumbnailPath] = await Promise.all(promises);
         return { filePath, thumbnailPath };
     } catch (err) {
         console.error(err);
