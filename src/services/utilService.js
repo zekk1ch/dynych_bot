@@ -1,6 +1,12 @@
+const fs = require('fs');
 const path = require('path');
+const util = require('util');
 const fetch = require('node-fetch');
 const emojiService = require('./emojiService');
+
+const deleteFile = util.promisify(fs.unlink);
+const fileStats = util.promisify(fs.stat);
+const renameFile = util.promisify(fs.rename);
 
 const explainError = (err) => {
     let message = emojiService.emojis.GRIMACING_FACE;
@@ -74,13 +80,29 @@ const getMetadata = (filePath) => {
 
     return { title, performer };
 };
+const convertMetadataToString = (metadata) => {
+    let res = '';
+    Object.entries(metadata).forEach(([key, value]) => {
+        if (value) {
+            res += `-metadata ${key}="${value}" `;
+        }
+    });
+    return res ? res.slice(10, -1) : '';
+};
 
 module.exports = {
+    deleteFile,
+    fileStats,
+    renameFile,
     explainError,
     makeRequest,
     sleep,
     getRandomString,
     getRandomArrayItem,
     randomizeArray,
-    getMetadata,
+    incrementFileName,
+    parseMetadataYoutube,
+    parseMetadataMpeg,
+    getMetadataFromFilename,
+    convertMetadataToString,
 };
