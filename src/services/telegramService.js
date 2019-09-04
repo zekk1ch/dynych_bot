@@ -116,7 +116,7 @@ const sendRandomMeme = async (chatId) => {
     await util.makeRequest(constants.telegramUrl + '/sendPhoto', { method: 'POST', body: form });
 
     await chatService.incrementMemeUrl(chatId);
-    await mediaService.deleteFile(filePath);
+    await util.deleteFile(filePath);
 };
 
 const createChat = async (chatId) => {
@@ -164,91 +164,80 @@ const answerCallback = (callbackId) => {
     return util.makeRequest(constants.telegramUrl + '/answerCallbackQuery', options);
 };
 
-const sendVideo = async (chatId, url, { callbackId, replyMessageId } = {}) => {
-    const form = new FormData();
-    form.append('chat_id', chatId);
-    if (replyMessageId) {
-        form.append('reply_to_message_id', replyMessageId);
+const media = {
+    mp3: {
+        type: 'audio',
+        hookMethod: 'sendAudio',
+    },
+    mp4: {
+        type: 'video',
+        hookMethod: 'sendVideo',
+    },
+};
+const sendMedia = async (format, chatId, url, { callbackId, replyMessageId } = {}) => {
+    if (!Object.keys(media).includes(format)) {
+        throw new Error(`Unsupported media format – "${format}"`);
     }
-
-    let savedFilePath;
-    const file = await chatService
-        .getFileByUrl(chatId, url)
-        .catch(() => null);
-    if (file) {
-        form.append('video', file.id);
-    } else {
-        const filePath = await mediaService.fetchVideo(url);
-        savedFilePath = filePath;
-        form.append('video', fs.createReadStream(filePath));
-    }
-    const thumbnailPath = await mediaService.fetchThumbnail(url);
-    form.append('thumb', fs.createReadStream(thumbnailPath));
-
-    const response = await util.makeRequest(constants.telegramUrl + '/sendVideo', { method: 'POST', body: form });
     if (callbackId) {
-        await answerCallback(callbackId).catch((err) => console.error(err));
+        await answerCallback(callbackId).catch((err) => {
+            console.error('Failed to answer callback query');
+            console.error(err);
+        });
     }
 
-    const promises = [mediaService.deleteFile(thumbnailPath)];
-    if (savedFilePath) {
-        const metadata = util.getMetadata(savedFilePath);
-        promises.push(
-            chatService.saveFile(chatId, {
-                id: response.result.video.file_id,
-                url,
-                title: metadata.title,
-                performer: metadata.performer,
-                format: 'mp4',
-            }),
-            mediaService.deleteFile(savedFilePath),
-        );
+    const file = await chatService.getFileByUrl(chatId, url, format);
+    if (file) {
+        const partIds = file.parts.map((part) => part.id);
+        for (let partId of partIds) {
+            const form = new FormData();
+            form.append('chat_id', chatId);
+            form.append(media[format].type, partId);
+            if (partIds.length === 1 && replyMessageId) {
+                form.append('reply_to_message_id', replyMessageId);
+            }
+
+            await util.makeRequest(`${constants.telegramUrl}/${media[format].hookMethod}`, { method: 'POST', body: form });
+        }
+        return;
+    }
+
+    const filePath = await mediaService.fetchVideo(url, format);
+    const parts = await mediaService.splitFile(filePath);
+
+    const fileIds = [];
+    for (let part of parts) {
+        const form = new FormData();
+        form.append('chat_id', chatId);
+        form.append(media[format].type, fs.createReadStream(part.path));
+        form.append('title', part.metadata.track || part.metadata.title);
+        form.append('performer', part.metadata.artist);
+        if (parts.length === 1 && replyMessageId) {
+            form.append('reply_to_message_id', replyMessageId);
+        }
+
+        const response = await util.makeRequest(`${constants.telegramUrl}/${media[format].hookMethod}`, { method: 'POST', body: form });
+        fileIds.push(response.result[media[format].type].file_id);
+    }
+
+    const promises = [];
+    promises.push(chatService.saveFile(chatId, {
+        url,
+        format,
+        track: parts[0].metadata.track,
+        artist: parts[0].metadata.artist,
+        album: parts[0].metadata.album,
+        parts: parts.map((part, i) => ({
+            id: fileIds[i],
+            title: part.metadata.title,
+        })),
+    }));
+    promises.push(util.deleteFile(filePath));
+    if (parts.length > 1) {
+        parts.forEach((part) => {
+            promises.push(util.deleteFile(part.path));
+        });
     }
     await Promise.all(promises);
-};
-
-const sendAudio = async (chatId, url, { callbackId, replyMessageId } = {}) => {
-    const form = new FormData();
-    form.append('chat_id', chatId);
-    if (replyMessageId) {
-        form.append('reply_to_message_id', replyMessageId);
-    }
-
-    let savedFilePath;
-    const file = await chatService
-        .getFileByUrl(chatId, url, 'mp3')
-        .catch(() => null);
-    if (file) {
-        form.append('audio', file.id);
-        form.append('title', file.title);
-        form.append('performer', file.performer);
-    } else {
-        const filePath = await mediaService.fetchVideo(url, 'mp3');
-        savedFilePath = filePath;
-        form.append('audio', fs.createReadStream(filePath));
-
-        const metadata = util.getMetadata(filePath);
-        form.append('title', metadata.title);
-        form.append('performer', metadata.performer);
-    }
-
-    const response = await util.makeRequest(constants.telegramUrl + '/sendAudio', { method: 'POST', body: form });
-    if (callbackId) {
-        await answerCallback(callbackId).catch((err) => console.error(err));
-    }
-
-    if (savedFilePath) {
-        await Promise.all([
-            chatService.saveFile(chatId, {
-                id: response.result.audio.file_id,
-                url,
-                title: response.result.audio.title,
-                performer: response.result.audio.performer,
-                format: 'mp3',
-            }),
-            mediaService.deleteFile(savedFilePath),
-        ]);
-    }
 };
 
 const setReminder = async (chatId) => {
@@ -302,8 +291,8 @@ module.exports = {
     createChat: wrapSendStatus(statusTypes.typing, createChat),
     randomizeMemeUrls: wrapSendStatus(statusTypes.typing, randomizeMemeUrls),
     saveFromYoutube: wrapSendStatus(statusTypes.typing, saveFromYoutube),
-    sendVideo: wrapSendStatus(statusTypes.uploadAudio, sendVideo),
-    sendAudio: wrapSendStatus(statusTypes.uploadAudio, sendAudio),
+    sendVideo: wrapSendStatus(statusTypes.uploadAudio, (...args) => sendMedia('mp4', ...args)),
+    sendAudio: wrapSendStatus(statusTypes.uploadAudio, (...args) => sendMedia('mp3', ...args)),
     setReminder: wrapSendStatus(statusTypes.typing, setReminder),
     sendReminder: wrapSendStatus(statusTypes.typing, sendReminder),
     sendGame,

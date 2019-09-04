@@ -64,7 +64,46 @@ const randomizeArray = (array) => {
     return randomized;
 };
 
-const getMetadata = (filePath) => {
+const incrementFileName = (fileName) => {
+    const splitted = fileName.slice().split('.');
+
+    let name, format = '';
+    if (splitted.length > 1) {
+        format = '.' + splitted.pop();
+        name = splitted.join('.');
+    } else {
+        name = fileName;
+    }
+
+    let part = name.match(/__part_[-+]?(?<number>\d+)$/);
+    if (part) {
+        part = Number(part.groups.number) + 1;
+        name = name.replace(/__part_[-+]?\d+$/, '');
+    } else {
+        part = 1;
+    }
+
+    return `${name}__part_${part}${format}`;
+};
+
+const parseMetadataYoutube = (info = {}) => {
+    const replaceRegex = /[?'"%!@#^&]+/g;
+
+    return {
+        title: typeof info.title === 'string' ? info.title.replace(replaceRegex, '') : '',
+        category: typeof info.category === 'string' ? info.category.replace(replaceRegex, '') : '',
+        track: typeof info.song === 'string' ? info.song.replace(replaceRegex, '') : '',
+        artist: typeof info.artist === 'string' ? info.artist.replace(replaceRegex, '') : '',
+        album: typeof info.album === 'string' ? info.album.replace(replaceRegex, '') : '',
+    };
+};
+const parseMetadataMpeg = (mpeg = {}) => ({
+    title: mpeg.title || '',
+    track: mpeg.track || '',
+    artist: mpeg.artist || '',
+    album: mpeg.album || '',
+});
+const getMetadataFromFilename = (filePath) => {
     const delimiter = ' - ';
     let title, performer;
 

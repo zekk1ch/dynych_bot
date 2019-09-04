@@ -16,4 +16,5 @@ module.exports = {
         minute: 1000 * 60,
         hour: 1000 * 60 * 60,
     },
+    maxBytes: 50 * 1000 * 1024,
 };
