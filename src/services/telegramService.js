@@ -178,28 +178,28 @@ const sendMedia = async (format, chatId, url, { callbackId, replyMessageId } = {
     if (!Object.keys(media).includes(format)) {
         throw new Error(`Unsupported media format – "${format}"`);
     }
-    // if (callbackId) {
-        // await answerCallback(callbackId).catch((err) => {
-        //     console.error('Failed to answer callback query');
-        //     console.error(err);
-        // });
-    // }
-    //
-    // const file = await chatService.getFileByUrl(chatId, url, format);
-    // if (file) {
-    //     const partIds = file.parts.map((part) => part.id);
-    //     for (let partId of partIds) {
-    //         const form = new FormData();
-    //         form.append('chat_id', chatId);
-    //         form.append(media[format].type, partId);
-    //         if (partIds.length === 1 && replyMessageId) {
-    //             form.append('reply_to_message_id', replyMessageId);
-    //         }
-    //
-    //         await util.makeRequest(`${constants.telegramUrl}/${media[format].hookMethod}`, { method: 'POST', body: form });
-    //     }
-    //     return;
-    // }
+    if (callbackId) {
+        await answerCallback(callbackId).catch((err) => {
+            console.error('Failed to answer callback query');
+            console.error(err);
+        });
+    }
+
+    const file = await chatService.getFileByUrl(chatId, url, format);
+    if (file) {
+        const partIds = file.parts.map((part) => part.id);
+        for (let partId of partIds) {
+            const form = new FormData();
+            form.append('chat_id', chatId);
+            form.append(media[format].type, partId);
+            if (partIds.length === 1 && replyMessageId) {
+                form.append('reply_to_message_id', replyMessageId);
+            }
+
+            await util.makeRequest(`${constants.telegramUrl}/${media[format].hookMethod}`, { method: 'POST', body: form });
+        }
+        return;
+    }
 
     const filePath = await mediaService.fetchVideo(url, format);
     const parts = await mediaService.splitFile(filePath);
