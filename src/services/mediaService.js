@@ -7,7 +7,7 @@ const constants = require('../constants');
 const util = require('./utilService');
 
 const saveFile = (fileName, readStream, metadata, overwrite = false) => new Promise(async (resolve, reject) => {
-    const fileNameEscaped = fileName.replace(/ +/g, '_');
+    const fileNameEscaped = fileName.replace(/ +/g, '_').replace(/['"&?]/g, '');
     const filePath = path.join(constants.rootPath, 'temp', fileNameEscaped);
     const tempFilePath = path.join(constants.rootPath, 'temp', `__${fileNameEscaped}`);
 

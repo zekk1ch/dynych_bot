@@ -86,17 +86,13 @@ const incrementFileName = (fileName) => {
     return `${name}__part_${part}${format}`;
 };
 
-const parseMetadataYoutube = (info = {}) => {
-    const replaceRegex = /[?'"%!@#^&]+/g;
-
-    return {
-        title: typeof info.title === 'string' ? info.title.replace(replaceRegex, '') : '',
-        category: typeof info.category === 'string' ? info.category.replace(replaceRegex, '') : '',
-        track: typeof info.song === 'string' ? info.song.replace(replaceRegex, '') : '',
-        artist: typeof info.artist === 'string' ? info.artist.replace(replaceRegex, '') : '',
-        album: typeof info.album === 'string' ? info.album.replace(replaceRegex, '') : '',
-    };
-};
+const parseMetadataYoutube = (info = {}) => ({
+    title: info.title,
+    category: info.media.category || '',
+    track: info.media.song || '',
+    artist: info.media.artist || '',
+    album: info.media.album || '',
+});
 const parseMetadataMpeg = (mpeg = {}) => ({
     title: mpeg.title || '',
     track: mpeg.track || '',
