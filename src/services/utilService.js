@@ -1,15 +1,15 @@
 const fs = require('fs');
 const path = require('path');
-const util = require('util');
+const nodeUtil = require('util');
 const fetch = require('node-fetch');
-const emojiService = require('./emojiService');
+const emojis = require('../emojis');
 
-const deleteFile = util.promisify(fs.unlink);
-const fileStats = util.promisify(fs.stat);
-const renameFile = util.promisify(fs.rename);
+const deleteFile = nodeUtil.promisify(fs.unlink);
+const fileStats = nodeUtil.promisify(fs.stat);
+const renameFile = nodeUtil.promisify(fs.rename);
 
 const explainError = (err) => {
-    let message = emojiService.emojis.GRIMACING_FACE;
+    let message = emojis.GRIMACING_FACE;
 
     if (err instanceof Error) {
         if (err.message) {
