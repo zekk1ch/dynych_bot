@@ -5,10 +5,10 @@
     "main": "scripts/startServer.js",
     "scripts": {
         "start": "node scripts/startServer.js",
+        "build": "webpack",
         "dev": "nodemon scripts/startServer.js",
+        "dev-pwa": "webpack-dev-server",
         "sync": "browser-sync start --c browser-sync.config.js",
-        "pwa-build": "webpack",
-        "pwa-dev": "webpack-dev-server",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "repository": {
