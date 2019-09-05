@@ -46,20 +46,32 @@ const incrementMemeUrl = async (id) => {
 };
 
 const validateFile = (file = {}) => {
-    if (!file.id || typeof file.id !== 'string') {
-        throw new Error(`Invalid file ID – "${file.id}"`);
-    }
     if (!file.url || typeof file.url !== 'string') {
         throw new Error(`Invalid file URL – "${file.url}"`);
     }
     if (!file.format || !['mp3', 'mp4'].includes(file.format)) {
         throw new Error(`Invalid file format – "${file.format}"`);
     }
-    if (!file.title || typeof file.title !== 'string') {
-        throw new Error(`Invalid file title – "${file.title}"`);
+    if (!Array.isArray(file.parts)) {
+        throw new Error(`Invalid file parts – "${file.parts}"`);
     }
-    if (!file.performer || typeof file.performer !== 'string') {
-        throw new Error(`Invalid file performer – "${file.performer}"`);
+    file.parts.forEach((part, i, arr) => {
+        if (!part.id || typeof part.id !== 'string') {
+            throw new Error(`Invalid ID of a file part at index ${i} in "${arr}"`);
+        }
+        if (!part.title || typeof part.title !== 'string') {
+            throw new Error(`Invalid title of a file part at index ${i} in "${arr}"`);
+        }
+    });
+
+    if (file.track && typeof file.track !== 'string') {
+        throw new Error(`Invalid file track name – "${file.track}"`);
+    }
+    if (file.artist && typeof file.artist !== 'string') {
+        throw new Error(`Invalid file artist – "${file.artist}"`);
+    }
+    if (file.album && typeof file.album !== 'string') {
+        throw new Error(`Invalid file album – "${file.album}"`);
     }
 };
 
@@ -75,18 +87,10 @@ const saveFile = async (id, file) => {
     await chat.update({ files }, { where: {id} });
 };
 
-const getFile = async (id, fileId) => {
-    const chat = await models.Chat.scope('file').findByPk(id);
-    if (!chat) {
-        return undefined;
-    }
-    return chat.get('files').find((file) => file.id === fileId);
-};
-
 const getFileByUrl = async (id, url, format = 'mp4') => {
     const chat = await models.Chat.scope('file').findByPk(id);
     if (!chat) {
-        return undefined;
+        return null;
     }
     return chat.get('files').find((file) => file.url === url && file.format === format);
 };
@@ -98,6 +102,5 @@ module.exports = {
     getMemeUrl,
     incrementMemeUrl,
     saveFile,
-    getFile,
     getFileByUrl,
 };

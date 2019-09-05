@@ -3,3 +3,5 @@
 /images
 /TODO.js
 /test.js
+/temp
+!/temp/empty.txt
