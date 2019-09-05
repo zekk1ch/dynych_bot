@@ -8,4 +8,5 @@ module.exports = {
     MEME_URLS_PATH: process.env.MEME_URLS_PATH,
     MEME_PATH: process.env.MEME_PATH,
     MEME_AUTH_COOKIE: process.env.MEME_AUTH_COOKIE,
+    MODE: process.env.NODE_ENV,
 };
