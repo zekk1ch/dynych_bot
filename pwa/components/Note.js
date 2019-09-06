@@ -32,16 +32,26 @@ class Note extends React.Component {
         });
     };
     startSliding = () => {
-        window.addEventListener('mousemove', this.handleMouseMove);
-        window.addEventListener('mouseup', this.handleMouseUp);
+        if (this.props.isTouchScreen) {
+            window.addEventListener('touchmove', this.handleTouchMove);
+            window.addEventListener('touchend', this.handleTouchEnd);
+        } else {
+            window.addEventListener('mousemove', this.handleMouseMove);
+            window.addEventListener('mouseup', this.handleMouseUp);
+        }
 
         this.setState({
             isSliding: true,
         });
     };
     stopSliding = () => {
-        window.removeEventListener('mousemove', this.handleMouseMove);
-        window.removeEventListener('mouseup', this.handleMouseUp);
+        if (this.props.isTouchScreen) {
+            window.removeEventListener('touchmove', this.handleTouchMove);
+            window.removeEventListener('touchend', this.handleTouchEnd);
+        } else {
+            window.removeEventListener('mousemove', this.handleMouseMove);
+            window.removeEventListener('mouseup', this.handleMouseUp);
+        }
 
         let state = {
             isSliding: false,
@@ -75,6 +85,17 @@ class Note extends React.Component {
         this.slide(offset);
     };
     handleMouseUp = (e) => {
+        this.stopSliding();
+    };
+    handleTouchStart = (e) => {
+        this.cursorOffset = e.touches[0].clientX - this.state.left;
+        this.startSliding();
+    };
+    handleTouchMove = (e) => {
+        const offset = (e.touches[0].clientX - this.cursorOffset) - this.state.left;
+        this.slide(offset);
+    };
+    handleTouchEnd = (e) => {
         this.stopSliding();
     };
 
@@ -116,7 +137,8 @@ class Note extends React.Component {
             <div id={this.props.id}
                  className={this.className}
                  style={this.style}
-                 onMouseDown={this.handleMouseDown}
+                 onMouseDown={(!this.props.isTouchScreen || null) && this.handleMouseDown}
+                 onTouchStart={(this.props.isTouchScreen || null) && this.handleTouchStart}
             >
                 <div className="note-content">
                     <div className="note-text">
@@ -134,4 +156,5 @@ Note.propTypes = {
     id: PropTypes.string.isRequired,
     text: PropTypes.string.isRequired,
     deleteNote: PropTypes.func.isRequired,
+    isTouchScreen: PropTypes.bool.isRequired,
 };

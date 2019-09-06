@@ -9,6 +9,7 @@ const List = (props) => {
                 <Note
                     key={note.id}
                     deleteNote={() => props.deleteNote(note.id)}
+                    isTouchScreen={props.isTouchScreen}
                     {...note}
                 />
             ))}
@@ -23,4 +24,5 @@ List.propTypes = {
         id: PropTypes.string,
     })).isRequired,
     deleteNote: PropTypes.func.isRequired,
+    isTouchScreen: PropTypes.bool.isRequired,
 };
