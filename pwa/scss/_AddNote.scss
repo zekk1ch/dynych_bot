@@ -46,10 +46,10 @@
         svg {
             color: $submit-color;
             transition: color 0.2s ease-out;
-            font-size: 34px;
+            font-size: 35px;
         }
 
-        &:hover, &:not(.disabled):focus {
+        &:not(.disabled) {
             cursor: pointer;
 
             svg {
