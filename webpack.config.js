@@ -21,6 +21,9 @@ module.exports = {
                             '@babel/preset-env',
                             '@babel/preset-react',
                         ],
+                        plugins: [
+                            '@babel/plugin-proposal-class-properties',
+                        ],
                     },
                 },
             },
@@ -40,6 +43,7 @@ module.exports = {
             template: './pwa/index.html',
         }),
     ],
+    devtool: 'eval-source-map',
     devServer: {
         hot: true,
     },
