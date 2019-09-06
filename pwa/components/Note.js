@@ -56,12 +56,12 @@ class Note extends React.Component {
         let state = {
             isSliding: false,
         };
-        if (this.offsetIndex > 0.5) {
+        if (this.offsetIndex > 0.25) {
             state.offset = this.state.right * Math.sign(this.state.offset);
             state.isDeleted = true;
             setTimeout(() => {
                 this.props.deleteNote();
-            }, 800);
+            }, 400);
         } else {
             state.offset = 0;
         }
@@ -106,6 +106,9 @@ class Note extends React.Component {
         }
         if (this.state.isDeleted) {
             className += ' deleted';
+        }
+        if (this.state.right !== 0) {
+            className += ' created';
         }
 
         return className;

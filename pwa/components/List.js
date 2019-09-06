@@ -3,6 +3,14 @@ import PropTypes from 'react-proptypes';
 import Note from './Note';
 
 const List = (props) => {
+    if (!props.notes.length) {
+        return (
+            <div className="list list-empty">
+                <p>Current list is empty</p>
+            </div>
+        );
+    }
+
     return (
         <div className="list">
             {props.notes.map((note, i) => (

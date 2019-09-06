@@ -1,0 +1,61 @@
+.add-note {
+    max-height: 72px;
+    transition: max-height 0.4s, opacity 0.4s;
+    overflow: hidden;
+
+    &.hidden {
+        max-height: 0;
+        opacity: 0;
+        transition: max-height 0.3s ease-out, opacity 0.5s;
+    }
+
+    &-content {
+        padding: 0 8px 6px;
+        display: flex;
+        align-items: center;
+        margin: 6px;
+
+        input {
+            width: 100%;
+            border: 1px solid $border-color1;
+            border-radius: 22px;
+            font-size: 20px;
+            padding: 10px 20px;
+            background-color: #f9f9f9;
+            color: $text-color1;
+            outline: 0;
+
+            &::placeholder {
+                color: lighten($text-color3, 20);
+                font-size: 18px;
+            }
+            &:focus {
+                box-shadow: 0 0 4pt 2pt #e0e0e0;
+            }
+            &.empty {
+                background-color: #f3f3f3;
+            }
+        }
+    }
+
+    &-submit {
+        margin: 0 2px 0 12px;
+        min-width: 34px;
+        outline: 0;
+
+        svg {
+            color: $submit-color;
+            transition: color 0.2s ease-out;
+            font-size: 34px;
+        }
+
+        &:hover, &:not(.disabled):focus {
+            cursor: pointer;
+
+            svg {
+                color: lighten($submit-color, 20);
+                font-size: 36px;
+            }
+        }
+    }
+}

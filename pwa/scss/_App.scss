@@ -1,0 +1,13 @@
+#root {
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    padding-top: 8px;
+
+    .list {
+        flex-grow: 1;
+    }
+    .add-note {
+        flex-shrink: 0;
+    }
+}
