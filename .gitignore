@@ -1,7 +1,7 @@
 /.idea
 /node_modules
-/images
-/TODO.js
-/test.js
+/public/todo
 /temp
 !/temp/empty.txt
+/TODO.js
+/test.js

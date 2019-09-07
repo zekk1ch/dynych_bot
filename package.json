@@ -4,11 +4,11 @@
     "description": "",
     "main": "scripts/startServer.js",
     "scripts": {
-        "start": "node scripts/startServer.js",
         "build": "webpack",
+        "start": "node scripts/startServer.js",
         "dev": "nodemon scripts/startServer.js",
         "dev-pwa": "webpack-dev-server",
-        "sync": "browser-sync start --c browser-sync.config.js",
+        "dev-game": "browser-sync start --c browser-sync.config.js",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "repository": {
@@ -45,8 +45,12 @@
         "@babel/plugin-proposal-class-properties": "^7.5.5",
         "@babel/preset-env": "^7.5.5",
         "@babel/preset-react": "^7.0.0",
+        "app-manifest-webpack-plugin": "^1.2.0",
         "babel-loader": "^8.0.6",
+        "babel-polyfill": "^6.26.0",
         "browser-sync": "^2.26.7",
+        "clean-webpack-plugin": "^3.0.0",
+        "copy-webpack-plugin": "^5.0.4",
         "css-loader": "^3.2.0",
         "html-webpack-plugin": "^3.2.0",
         "node-sass": "^4.12.0",

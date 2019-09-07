@@ -1,13 +1,21 @@
 const path = require('path');
-const HtmlPlugin = require('html-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const AppManifestWebpackPlugin = require('app-manifest-webpack-plugin');
 const env = require('./env');
+const appManifest = require('./pwa/appManifest');
+
 
 module.exports = {
     mode: env.MODE,
-    entry: './pwa/index.js',
+    entry: {
+        app: ['babel-polyfill', './pwa/index.js'],
+    },
     output: {
-        filename: 'bundle.js',
-        path: path.resolve('./public/todo'),
+        filename: '[name].bundle.js',
+        path: path.resolve('public', 'todo'),
+        publicPath: env.MODE === 'production' ? '/todo' : '/',
     },
     module: {
         rules: [
@@ -38,9 +46,21 @@ module.exports = {
         ],
     },
     plugins: [
-        new HtmlPlugin({
+        new CleanWebpackPlugin(),
+        new CopyWebpackPlugin([
+            './pwa/sw.js',
+        ]),
+        new HtmlWebpackPlugin({
             title: 'Туду',
-            template: './pwa/index.html',
+            template: './pwa/template.ejs',
+            viewport: 'width=device-width, initial-scale=1',
+        }),
+        new AppManifestWebpackPlugin ({
+            logo: './pwa/logo.png',
+            output: 'assets/',
+            prefix: '/assets/',
+            persistentCache: false,
+            config: appManifest,
         }),
     ],
     devtool: 'eval-source-map',
