@@ -4,8 +4,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const AppManifestWebpackPlugin = require('app-manifest-webpack-plugin');
 const env = require('./env');
-const appManifest = require('./pwa/appManifest');
-
+const isProd = env.MODE === 'production';
 
 module.exports = {
     mode: env.MODE,
@@ -15,7 +14,6 @@ module.exports = {
     output: {
         filename: '[name].bundle.js',
         path: path.resolve('public', 'todo'),
-        publicPath: env.MODE === 'production' ? '/todo' : '/',
     },
     module: {
         rules: [
@@ -51,16 +49,25 @@ module.exports = {
             './pwa/sw.js',
         ]),
         new HtmlWebpackPlugin({
-            title: 'Туду',
             template: './pwa/template.ejs',
-            viewport: 'width=device-width, initial-scale=1',
+            title: 'Туду',
         }),
         new AppManifestWebpackPlugin ({
             logo: './pwa/logo.png',
             output: 'assets/',
-            prefix: '/assets/',
+            prefix: isProd ? '/todo/assets/' : '/assets/',
             persistentCache: false,
-            config: appManifest,
+            config: {
+                appName: 'Notes',
+                appShortName: 'Notes',
+                appDescription: 'This is a simple PWA that saves notes in cache memory',
+                background: '#f0f',
+                theme_color: '#ff0',
+                display: 'standalone',
+                orientation: 'portrait',
+                start_url: isProd ? '/todo/' : '/',
+                version: '1.0.0',
+            },
         }),
     ],
     devtool: 'eval-source-map',
