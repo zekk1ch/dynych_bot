@@ -1,17 +1,21 @@
 .add-note {
+    box-shadow: 0 10px 10px 0 #fff;
     max-height: 72px;
-    transition: max-height 0.29s, opacity 0.15s ease-out;
+    opacity: 1;
+    padding: 14px 6px 0;
+    transition: max-height 0.29s, opacity 0.2s ease-out, padding-top 0.2s ease 0.05s;
+    z-index: 1;
 
     &.hidden {
         max-height: 0;
         opacity: 0;
+        padding-top: 0;
     }
 
     &-content {
-        padding: 0 8px 6px;
+        padding: 0 8px 2px;
         display: flex;
         align-items: flex-end;
-        margin: 6px 6px 0;
 
         input {
             flex-grow: 1;
@@ -38,9 +42,10 @@
 
     &-submit {
         cursor: pointer;
+        min-width: 34px;
         max-width: 34px;
         margin-left: 12px;
-        transition: margin-left 0.15s ease 0.05s, max-width 0.3s, opacity 0.4s;
+        transition: margin-left 0.15s ease 0.05s, max-width 0.3s, min-width 0.3s, opacity 0.4s;
         outline: 0;
 
         svg {
@@ -51,10 +56,11 @@
 
     &.disabled &-submit {
         cursor: auto;
+        min-width: 0;
         max-width: 0;
         margin: 0;
         opacity: 0;
-        transition: margin 0.5s, max-width 0.5s, opacity 0.3s;
+        transition: margin 0.5s, max-width 0.5s, min-width 0.5s, opacity 0.3s;
 
         svg {
             height: 0;
