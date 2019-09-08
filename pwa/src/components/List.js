@@ -1,8 +1,18 @@
-import React from 'react';
+import React, {
+    useRef,
+    useEffect,
+} from 'react';
 import PropTypes from 'react-proptypes';
 import Note from './Note';
 
 const List = (props) => {
+    const list = useRef(null);
+    useEffect(() => {
+        if (list.current) {
+            list.current.scrollTo(0, 0)
+        }
+    });
+
     if (!props.notes.length) {
         return (
             <div className="list list-empty">
@@ -12,8 +22,8 @@ const List = (props) => {
     }
 
     return (
-        <div className="list">
-            {props.notes.map((note, i) => (
+        <div className="list" ref={list}>
+            {props.notes.map((note) => (
                 <Note
                     key={note.id}
                     deleteNote={() => props.deleteNote(note.id)}
