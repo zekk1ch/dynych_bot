@@ -34,7 +34,7 @@ class App extends React.Component {
 
     render() {
         return (
-            <>
+            <div className="app">
                 <AddNote
                     addNote={this.addNote}
                     isHidden={!this.state.isShowingAddNote}
@@ -47,8 +47,9 @@ class App extends React.Component {
                 <Controls
                     isShowingAddNote={this.state.isShowingAddNote}
                     toggleIsShowingAddNote={this.toggleIsShowingAddNote}
+                    isHidden={this.state.notes.length === 0}
                 />
-            </>
+            </div>
         );
     }
 }

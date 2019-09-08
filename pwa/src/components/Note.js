@@ -61,7 +61,7 @@ class Note extends React.Component {
             state.isDeleted = true;
             setTimeout(() => {
                 this.props.deleteNote();
-            }, 400);
+            }, 280);
         } else {
             state.offset = 0;
         }

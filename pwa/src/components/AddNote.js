@@ -17,7 +17,6 @@ const AddNote = (props) => {
     const submit = () => {
         props.addNote(text);
         setText('');
-
     };
     const handleKeyDown = (e) => {
         if (e.keyCode === 13 && text.length > 0) {
@@ -37,7 +36,7 @@ const AddNote = (props) => {
     };
 
     return (
-        <div className={`add-note${props.isHidden ? ' hidden' : ''}`}>
+        <div className={`add-note${props.isHidden ? ' hidden' : ''}${text.length === 0 ? ' disabled' : ''}`}>
             <div className="add-note-content">
                 <input
                     value={text}
@@ -48,7 +47,7 @@ const AddNote = (props) => {
                     ref={input}
                 />
                 <div
-                    className={`add-note-submit${text.length === 0 ? ' disabled' : ''}`}
+                    className="add-note-submit"
                     onClick={handleClick}
                     onKeyDown={handleKeyDown}
                     tabIndex={2}
