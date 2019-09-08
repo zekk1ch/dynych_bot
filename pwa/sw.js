@@ -1,9 +1,12 @@
+importScripts('/swApi.js');
+
 const CACHE_NAME = 'notes';
 const getUrlsToCache = () => {
     const mode = new URL(location).searchParams.get('mode');
     const urls = [
         '/',
         '/app.bundle.js',
+        '/actionTypes.json',
     ];
 
     switch (mode) {

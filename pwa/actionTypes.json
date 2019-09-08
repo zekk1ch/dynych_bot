@@ -1,0 +1,5 @@
+{
+    "GET_NOTES": "GET_NOTES",
+    "SAVE_NOTE": "SAVE_NOTE",
+    "DELETE_NOTE": "DELETE_NOTE"
+}

@@ -5,7 +5,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 const Controls = (props) => (
     <div className={`controls${props.isHidden ? ' hidden' : ''}`}>
         <div className="controls-control" onClick={props.toggleIsShowingAddNote}>
-            <p>{props.isShowingAddNote ? 'hide' : 'show'}</p>
             <FontAwesomeIcon icon={[props.isShowingAddNote ? 'far' : 'fas', 'keyboard']}/>
         </div>
     </div>

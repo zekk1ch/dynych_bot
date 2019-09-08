@@ -9,6 +9,7 @@
     z-index: 1;
 
     &.hidden {
+        overflow: hidden;
         max-height: 0;
         opacity: 0;
         transition: max-height 0.1s, opacity 0.08s;

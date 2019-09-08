@@ -47,6 +47,8 @@ module.exports = {
         new CleanWebpackPlugin(),
         new CopyWebpackPlugin([
             './pwa/sw.js',
+            './pwa/swApi.js',
+            './pwa/actionTypes.json',
         ]),
         new HtmlWebpackPlugin({
             template: './pwa/template.ejs',
