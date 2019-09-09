@@ -62,7 +62,7 @@ module.exports = {
             config: {
                 appName: 'Notes',
                 appShortName: 'Notes',
-                appDescription: 'This is a simple PWA that saves notes in cache memory',
+                appDescription: 'This is a simple PWA that uses IndexedDB to save notes',
                 background: '#fff',
                 theme_color: '#fff',
                 display: 'standalone',

@@ -1,27 +1,14 @@
-importScripts('/swApi.js');
-
+const URL_PREFIX = new URL(location).searchParams.get('mode') === 'production' ? '/todo' : '';
+const URLS_TO_CACHE = [
+    '/',
+    '/app.bundle.js',
+    '/actionTypes.json',
+].map((url) => `${URL_PREFIX}${url}`);
 const CACHE_NAME = 'notes';
-const getUrlsToCache = () => {
-    const mode = new URL(location).searchParams.get('mode');
-    const urls = [
-        '/',
-        '/app.bundle.js',
-        '/actionTypes.json',
-    ];
 
-    switch (mode) {
-        case 'development':
-            return urls;
-        case 'production':
-            return urls.map((url) => `/todo${url}`);
-        default:
-            throw new Error('Environment mode must be either "development" or "production"');
-    }
-};
 const handleInstall = async () => {
-    const urlsToCache = getUrlsToCache();
     const cache = await caches.open(CACHE_NAME);
-    await cache.addAll(urlsToCache);
+    await cache.addAll(URLS_TO_CACHE);
 };
 const handleActivate = async () => {
     let promises;
@@ -34,10 +21,9 @@ const handleActivate = async () => {
 
     const cache = await caches.open(CACHE_NAME);
     const responses = await cache.matchAll();
-    const urlsToCache = getUrlsToCache();
     promises = responses
         .map((response) => response.url.replace(location.origin, ''))
-        .filter((url) => !urlsToCache.includes(url))
+        .filter((url) => !URLS_TO_CACHE.includes(url))
         .map((url) => cache.delete(url));
     await Promise.all(promises);
 };
@@ -73,3 +59,5 @@ self.addEventListener('activate', (e) => {
 self.addEventListener('fetch', (e) => {
     e.respondWith(handleFetch(e.request));
 });
+
+importScripts(`${URL_PREFIX}/swApi.js`);

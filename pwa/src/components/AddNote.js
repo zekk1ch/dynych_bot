@@ -15,7 +15,7 @@ const AddNote = (props) => {
     });
     const [text, setText] = useState('');
     const submit = () => {
-        props.addNote(text);
+        props.saveNote(text);
         setText('');
     };
     const handleKeyDown = (e) => {
@@ -62,6 +62,6 @@ const AddNote = (props) => {
 export default AddNote;
 
 AddNote.propTypes = {
-    addNote: PropTypes.func.isRequired,
+    saveNote: PropTypes.func.isRequired,
     isHidden: PropTypes.bool.isRequired,
 };

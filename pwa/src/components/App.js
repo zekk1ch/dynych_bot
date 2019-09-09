@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'react-proptypes';
+import uuid from 'uuid/v4';
 import * as actionTypes from '../../actionTypes';
 import List from './List';
 import Controls from './Controls';
@@ -8,7 +9,8 @@ import AddNote from './AddNote';
 class App extends React.Component {
     state = {
         notes: [],
-        isShowingAddNote: false,
+        isShowingAddNote: true,
+        isServiceWorkerConnected: false,
     };
     isTouchScreen = ('ontouchstart' in window);
 
@@ -20,21 +22,24 @@ class App extends React.Component {
             return alert(`Oops...\nCritical error – ${err.message}`);
         }
 
-        try {
-            const notes = await this.fetchNotes();
-
+        if (navigator.serviceWorker.controller === null) {
+            if (confirm('Page needs to be reloaded for the back-end changes to take effect\n\nReload?')) {
+                setTimeout(() => {
+                    location.reload();
+                }, 400);
+            }
+        } else {
             this.setState({
-                notes: notes,
-                isShowingAddNote: notes.length === 0,
-            });
-        } catch (err) {
-            console.error('Failed to fetch previously saved notes –', err);
-            this.setState({
-                isShowingAddNote: true,
-            });
+                isServiceWorkerConnected: true,
+            }, this.getNotes);
         }
     }
 
+    toggleIsShowingAddNote = () => {
+        this.setState({
+            isShowingAddNote: !this.state.isShowingAddNote,
+        });
+    };
     registerServiceWorker = async () => {
         if (!'serviceWorker' in navigator) {
             throw new Error('Browser doesn\'t support service workers');
@@ -44,7 +49,7 @@ class App extends React.Component {
         await navigator.serviceWorker.register(`./sw.js?mode=${this.props.mode}`, { scope });
     };
     postDataToServiceWorker = (data) => new Promise((resolve, reject) => {
-        if (navigator.serviceWorker.controller === null) {
+        if (!this.state.isServiceWorkerConnected) {
             reject(new Error('API service worker cannot currently process requests. Refresh the page'));
         }
 
@@ -59,24 +64,71 @@ class App extends React.Component {
 
         navigator.serviceWorker.controller.postMessage(data, [messageChannel.port2]);
     });
-    fetchNotes = () => {
-        const data = {
+    getNotes = async () => {
+        const request = {
             action: actionTypes.GET_NOTES,
         };
-        return this.postDataToServiceWorker(data);
+
+        try {
+            const notes = await this.postDataToServiceWorker(request);
+
+            this.setState({
+                notes,
+            });
+        } catch (err) {
+            console.error('Failed to fetch previously saved notes –', err);
+        }
     };
-    addNote = (text) => {
-        // TODO
+    saveNote = async (text) => {
+        const request = {
+            action: actionTypes.SAVE_NOTE,
+            data: {
+                id: uuid(),
+                text,
+                timestamp: Date.now(),
+            },
+        };
+
+        try {
+            const note = await this.postDataToServiceWorker(request);
+
+            this.setState({
+                notes: [note].concat(this.state.notes),
+            });
+        } catch (err) {
+            console.error('Failed to save note –', err);
+        }
+    };
+    deleteNote = async (id) => {
+        const request = {
+            action: actionTypes.DELETE_NOTE,
+            data: id,
+        };
+
+        try {
+            await this.postDataToServiceWorker(request);
+
+            const notes = this.state.notes.filter((note) => note.id !== id);
+            this.setState({
+                notes,
+                isShowingAddNote: this.state.isShowingAddNote || notes.length === 0,
+            });
+        } catch (err) {
+            console.error('Failed to delete note –', err);
+        }
+    };
+    saveNoteMock = (text) => {
         const note = {
-            id: Math.random().toString(),
+            id: uuid(),
             text,
+            timestamp: Date.now(),
         };
 
         this.setState({
             notes: [note].concat(this.state.notes),
         });
     };
-    deleteNote = (id) => {
+    deleteNoteMock = (id) => {
         const notes = this.state.notes.filter((note) => note.id !== id);
 
         this.setState({
@@ -84,22 +136,17 @@ class App extends React.Component {
             isShowingAddNote: this.state.isShowingAddNote || notes.length === 0,
         });
     };
-    toggleIsShowingAddNote = () => {
-        this.setState({
-            isShowingAddNote: !this.state.isShowingAddNote,
-        });
-    };
 
     render() {
         return (
             <div className="app">
                 <AddNote
-                    addNote={this.addNote}
+                    saveNote={this.state.isServiceWorkerConnected ? this.saveNote : this.saveNoteMock}
                     isHidden={!this.state.isShowingAddNote}
                 />
                 <List
                     notes={this.state.notes}
-                    deleteNote={this.deleteNote}
+                    deleteNote={this.state.isServiceWorkerConnected ? this.deleteNote : this.deleteNoteMock}
                     isTouchScreen={this.isTouchScreen}
                 />
                 <Controls
