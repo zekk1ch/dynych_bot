@@ -3,7 +3,7 @@ import './src/fontAwesomeLibrary';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './src/components/App';
-import * as env from '../env';
+import * as env from '../../env';
 
 ReactDOM.render(
     <App mode={env.MODE}/>,
