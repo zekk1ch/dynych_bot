@@ -3,4 +3,13 @@
     display: flex;
     flex-direction: column;
     overflow-x: hidden;
+    transition: background-color 0.18s;
+
+    svg {
+        transition: color 0.18s;
+    }
+}
+
+.app.dark {
+    background-color: $app-bg-color-inverse;
 }

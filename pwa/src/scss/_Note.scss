@@ -7,16 +7,23 @@
     min-height: 0;
     max-height: 0;
     overflow: hidden;
+    flex-shrink: 0;
+    padding: 4px 4px 4px 6px;
+    color: $text-color2;
+    word-break: break-word;
+    text-align: justify;
+    user-select: none;
 
     &:last-child {
         margin-bottom: 0;
     }
     &.created {
-        min-height: 35px;
-        max-height: 35px;
+        overflow: auto;
+        min-height: 18px;
+        max-height: 250px;
     }
     &:not(.sliding) {
-        transition: max-height 0.2s, min-height 0.2s, margin-left 0.4s;
+        transition: max-height 1s linear, min-height 0.4s, margin-left 0.4s;
     }
     &.deleted {
         min-height: 0;
@@ -26,15 +33,25 @@
         overflow: hidden;
     }
 
-    &-content {
-        margin: 8px 4px 8px 16px;
-    }
+    &-controls-group {
+        float: right;
 
-    &-text {
-        color: $text-color2;
-        user-select: none;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        overflow: hidden;
+        &.time {
+            color: $text-color3;
+            font-size: 11px;
+            margin: 3.5px 3px 0 6px;
+        }
+        &.clipboard {
+            margin-left: 6px;
+        }
+
+        &-control {
+            color: $text-color2;
+
+            &:hover {
+                cursor: pointer;
+                color: lighten($text-color2, 15);
+            }
+        }
     }
 }

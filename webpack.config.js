@@ -49,6 +49,7 @@ module.exports = {
             './pwa/sw.js',
             './pwa/swApi.js',
             './pwa/actionTypes.json',
+            './pwa/preferencesKeys.json',
         ]),
         new HtmlWebpackPlugin({
             template: './pwa/template.ejs',

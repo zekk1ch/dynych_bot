@@ -1,5 +1,4 @@
 .add-note {
-    box-shadow: 0 10px 10px 0 #fff;
     max-height: 72px;
     opacity: 1;
     padding: 14px 6px 0;
@@ -45,6 +44,30 @@
         }
     }
 
+    &-controls {
+        display: flex;
+        margin: auto 0;
+    }
+    &-control {
+        margin-right: 6px;
+
+        svg {
+            font-size: 20px;
+            color: $text-color1;
+        }
+
+        &:hover {
+            cursor: pointer;
+
+            svg {
+                color: lighten($text-color1, 10);
+            }
+        }
+    }
+    &-control:last-child {
+        margin-right: 8px;
+    }
+
     &-submit {
         cursor: pointer;
         min-width: 34px;
@@ -71,6 +94,15 @@
             height: 0;
             width: 0;
             transition: height 0.3s, width 0.4s;
+        }
+    }
+}
+.app.dark {
+    .add-note {
+        &-control {
+            svg {
+                color: $text-color1-inverse;
+            }
         }
     }
 }

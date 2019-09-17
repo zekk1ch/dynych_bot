@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'react-proptypes';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 class Note extends React.Component {
     state = {
@@ -77,6 +78,10 @@ class Note extends React.Component {
         this.setDimensions();
     };
     handleMouseDown = (e) => {
+        if (e.button !== 0) {
+            return;
+        }
+
         this.cursorOffset = e.clientX - this.state.left;
         this.startSliding();
     };
@@ -98,9 +103,13 @@ class Note extends React.Component {
     handleTouchEnd = (e) => {
         this.stopSliding();
     };
+    handleCopyToClipboardClick = async (e) => {
+        await navigator.clipboard.writeText(this.props.text);
+    };
 
     get className() {
         let className = 'note';
+
         if (this.state.offset !== 0) {
             className += ' sliding';
         }
@@ -143,11 +152,17 @@ class Note extends React.Component {
                  onMouseDown={(!this.props.isTouchScreen || null) && this.handleMouseDown}
                  onTouchStart={(this.props.isTouchScreen || null) && this.handleTouchStart}
             >
-                <div className="note-content">
-                    <div className="note-text">
-                        {this.props.text}
+                <div className="note-controls-group time">
+                    <div>
+                        {new Date(this.props.timestamp).toLocaleTimeString()}
                     </div>
                 </div>
+                <div className="note-controls-group clipboard">
+                    <div className="note-controls-group-control" onClick={this.handleCopyToClipboardClick}>
+                        <FontAwesomeIcon icon="copy"/>
+                    </div>
+                </div>
+                {this.props.text}
             </div>
         );
     }
@@ -158,6 +173,7 @@ export default Note;
 Note.propTypes = {
     id: PropTypes.string.isRequired,
     text: PropTypes.string.isRequired,
+    timestamp: PropTypes.number.isRequired,
     deleteNote: PropTypes.func.isRequired,
     isTouchScreen: PropTypes.bool.isRequired,
 };

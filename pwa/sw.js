@@ -3,6 +3,7 @@ const URLS_TO_CACHE = [
     '/',
     '/app.bundle.js',
     '/actionTypes.json',
+    '/preferencesKeys.json',
 ].map((url) => `${URL_PREFIX}${url}`);
 const CACHE_NAME = 'notes';
 

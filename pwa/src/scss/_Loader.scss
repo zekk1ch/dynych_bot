@@ -1,0 +1,38 @@
+.loader {
+    background: linear-gradient(35deg, #0e162617, #b4b9c51f);
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    transition: opacity 0.15s ease-in;
+
+    &:not(.hidden) {
+        z-index: 999;
+    }
+    &.hidden {
+        opacity: 0;
+        transition: opacity 0.1s ease-out;
+    }
+    &.hidden &-spinner {
+        svg {
+            color: rgba(0, 0, 0, 0);
+            transition: color 0.2s;
+        }
+    }
+
+    &-spinner {
+        position: absolute;
+        top: 20%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+
+        svg {
+            font-size: 140px;
+            color: $text-color1;
+            transition: color 0.2s linear 0.1s;
+
+            &:hover {
+                color: lighten($text-color1, 17);
+            }
+        }
+    }
+}

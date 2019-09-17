@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'react-proptypes';
 import uuid from 'uuid/v4';
 import * as actionTypes from '../../actionTypes';
+import * as preferencesKeys from '../../preferencesKeys';
+import Loader from './Loader';
 import List from './List';
 import Controls from './Controls';
 import AddNote from './AddNote';
@@ -10,34 +12,84 @@ class App extends React.Component {
     state = {
         notes: [],
         isShowingAddNote: true,
+        isDarkMode: false,
         isServiceWorkerConnected: false,
+        isLoaded: null,
+        permissions: {
+            clipboard: false,
+        },
     };
     isTouchScreen = ('ontouchstart' in window);
 
-    async componentDidMount() {
-        try {
-            await this.registerServiceWorker(this.props.mode);
-        } catch (err) {
-            console.error('Failed to register service worker –', err);
-            return alert(`Oops...\nCritical error – ${err.message}`);
-        }
-
-        if (navigator.serviceWorker.controller === null) {
-            if (confirm('Page needs to be reloaded for the back-end changes to take effect\n\nReload?')) {
-                setTimeout(() => {
-                    location.reload();
-                }, 400);
-            }
-        } else {
+    componentDidMount() {
+        // TODO: разобраться почему ЭТО работает а обычный setState без setTimeout - нет
+        setTimeout(async () => {
             this.setState({
-                isServiceWorkerConnected: true,
-            }, this.getNotes);
-        }
+                isLoaded: false,
+            });
+
+            this.initPermissions();
+
+            try {
+                await this.registerServiceWorker(this.props.mode);
+            } catch (err) {
+                console.error('Failed to register service worker –', err);
+                setTimeout(() => {
+                    alert(`Oops...\nCritical error – ${err.message}`);
+                });
+                return this.setState({
+                    isLoaded: true,
+                });
+            }
+
+            if (navigator.serviceWorker.controller === null) {
+                this.setState({
+                    isLoaded: true,
+                });
+                setTimeout(() => {
+                    if (confirm('Page needs to be reloaded for the back-end changes to take effect\\n\\nReload?')) {
+                        location.reload();
+                    }
+                }, 700);
+            } else {
+                this.setState({
+                    isServiceWorkerConnected: true,
+                }, async () => {
+                    await Promise.all([
+                        this.getPreferences(),
+                        this.getNotes(),
+                    ]);
+                    this.setState({
+                        isLoaded: true,
+                    });
+                });
+            }
+        });
     }
 
-    toggleIsShowingAddNote = () => {
+    initPermissions = async () => {
+        const isPermissionGranted = (status) => status === 'granted' || status === 'prompt';
+        const permissions = {
+            'clipboard': 'clipboard-read',
+        };
+        const promises = Object.keys(permissions)
+            .map((stateName) => async () => {
+                const permission = await navigator.permissions.query({ name: permissions[stateName] });
+                permissions[stateName] = isPermissionGranted(permission.state);
+                permission.onchange = (e) => {
+                    this.setState({
+                        permissions: {
+                            [stateName]: isPermissionGranted(e.target.state),
+                        },
+                    });
+                };
+            })
+            .map((fn) => fn());
+
+        await Promise.all(promises);
+
         this.setState({
-            isShowingAddNote: !this.state.isShowingAddNote,
+            permissions,
         });
     };
     registerServiceWorker = async () => {
@@ -64,6 +116,60 @@ class App extends React.Component {
 
         navigator.serviceWorker.controller.postMessage(data, [messageChannel.port2]);
     });
+    getPreferences = async () => {
+        const request = {
+            action: actionTypes.GET_PREFERENCES,
+        };
+
+        try {
+            const preferences = await this.postDataToServiceWorker(request);
+
+            this.setState({
+                isShowingAddNote: preferences[preferencesKeys.IS_KEYBOARD_SHOWN],
+                isDarkMode: preferences[preferencesKeys.IS_DARK_MODE]
+            });
+        } catch (err) {
+            console.error('Failed to fetch user preferences –', err);
+        }
+    };
+    toggleIsShowingAddNote = async () => {
+        const request = {
+            action: actionTypes.SET_PREFERENCE,
+            data: {
+                key: preferencesKeys.IS_KEYBOARD_SHOWN,
+                value: !this.state.isShowingAddNote,
+            },
+        };
+
+        try {
+            const isShowingAddNote = await this.postDataToServiceWorker(request);
+
+            this.setState({
+                isShowingAddNote,
+            });
+        } catch (err) {
+            console.error('Failed to show/hide keyboard –', err);
+        }
+    };
+    toggleIsDarkMode = async () => {
+        const request = {
+            action: actionTypes.SET_PREFERENCE,
+            data: {
+                key: preferencesKeys.IS_DARK_MODE,
+                value: !this.state.isDarkMode,
+            },
+        };
+
+        try {
+            const isDarkMode = await this.postDataToServiceWorker(request);
+
+            this.setState({
+                isDarkMode,
+            });
+        } catch (err) {
+            console.error('Failed to toggle dark mode –', err);
+        }
+    };
     getNotes = async () => {
         const request = {
             action: actionTypes.GET_NOTES,
@@ -111,8 +217,11 @@ class App extends React.Component {
             const notes = this.state.notes.filter((note) => note.id !== id);
             this.setState({
                 notes,
-                isShowingAddNote: this.state.isShowingAddNote || notes.length === 0,
             });
+
+            if (!this.state.notes.length && !this.state.isShowingAddNote) {
+                await this.toggleIsShowingAddNote();
+            }
         } catch (err) {
             console.error('Failed to delete note –', err);
         }
@@ -138,10 +247,19 @@ class App extends React.Component {
     };
 
     render() {
+        if (this.state.isLoaded === null) {
+            return <Loader isHidden={true}/>;
+        }
+        if (!this.state.isLoaded) {
+            return <Loader/>;
+        }
+
         return (
-            <div className="app">
+            <div className={`app${this.state.isDarkMode ? ' dark' : ''}`}>
                 <AddNote
                     saveNote={this.state.isServiceWorkerConnected ? this.saveNote : this.saveNoteMock}
+                    isClipboardAccessible={this.state.permissions.clipboard}
+                    isDarkMode={this.state.isDarkMode}
                     isHidden={!this.state.isShowingAddNote}
                 />
                 <List
@@ -152,7 +270,10 @@ class App extends React.Component {
                 <Controls
                     isShowingAddNote={this.state.isShowingAddNote}
                     toggleIsShowingAddNote={this.toggleIsShowingAddNote}
-                    isHidden={this.state.notes.length === 0}
+                    isIsShowingAddNoteToggleHidden={this.state.notes.length === 0}
+                    isDarkMode={this.state.isDarkMode}
+                    toggleIsDarkMode={this.toggleIsDarkMode}
+                    isHidden={false}
                 />
             </div>
         );
