@@ -9,6 +9,7 @@ module.exports = {
     mode: env.MODE,
     entry: {
         notes: ['babel-polyfill', './pwa/notes/index.js'],
+        daily: ['babel-polyfill', './pwa/daily/index.js'],
     },
     output: {
         filename: '[name]/bundle.js',
@@ -50,12 +51,19 @@ module.exports = {
             { to: 'notes', from:'./pwa/notes/swApi.js' },
             { to: 'notes', from:'./pwa/notes/actionTypes.json' },
             { to: 'notes', from:'./pwa/notes/preferencesKeys.json' },
+            { to: 'daily', from:'./pwa/daily/sw.js' },
         ]),
         new HtmlWebpackPlugin({
             chunks: ['notes'],
             filename: 'notes/index.html',
             template: './pwa/template.ejs',
             title: 'Туду',
+        }),
+        new HtmlWebpackPlugin({
+            chunks: ['daily'],
+            filename: 'daily/index.html',
+            template: './pwa/template.ejs',
+            title: 'Daily',
         }),
         new FaviconsWebpackPlugin ({
             inject: (htmlPlugin) => htmlPlugin.options.chunks[0] === 'notes',
@@ -72,6 +80,24 @@ module.exports = {
                 display: 'standalone',
                 orientation: 'portrait',
                 start_url: '/notes/',
+                version: '1.0.0',
+            }
+        }),
+        new FaviconsWebpackPlugin ({
+            inject: (htmlPlugin) => htmlPlugin.options.chunks[0] === 'daily',
+            logo: './pwa/daily/logo.png',
+            outputPath: '/daily/assets',
+            publicPath: '/daily',
+            prefix: 'assets/',
+            favicons: {
+                appName: 'Daily',
+                appShortName: 'Daily',
+                appDescription: 'This simple PWA will help you track your daily progress',
+                background: '#fff',
+                theme_color: '#fff',
+                display: 'standalone',
+                orientation: 'portrait',
+                start_url: '/daily/',
                 version: '1.0.0',
             }
         }),

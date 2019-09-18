@@ -1,6 +1,7 @@
 /.idea
 /node_modules
 /public/notes
+/public/daily
 /temp
 !/temp/empty.txt
 /TODO.js
