@@ -9,11 +9,11 @@ const isProd = env.MODE === 'production';
 module.exports = {
     mode: env.MODE,
     entry: {
-        todo: ['babel-polyfill', './pwa/todo/index.js'],
+        app: ['babel-polyfill', './pwa/index.js'],
     },
     output: {
-        filename: '[name]/app.bundle.js',
-        path: path.resolve('public'),
+        filename: '[name].bundle.js',
+        path: path.resolve('public', 'todo'),
     },
     module: {
         rules: [
@@ -44,21 +44,20 @@ module.exports = {
         ],
     },
     plugins: [
-        new CleanWebpackPlugin({ cleanOnceBeforeBuildPatterns: ['todo', 'daily'] }),
+        new CleanWebpackPlugin(),
         new CopyWebpackPlugin([
-            { to: 'todo', from: './pwa/todo/sw.js' },
-            { to: 'todo', from: './pwa/todo/swApi.js' },
-            { to: 'todo', from: './pwa/todo/actionTypes.json' },
-            { to: 'todo', from: './pwa/todo/preferencesKeys.json' },
+            './pwa/sw.js',
+            './pwa/swApi.js',
+            './pwa/actionTypes.json',
+            './pwa/preferencesKeys.json',
         ]),
         new HtmlWebpackPlugin({
-            filename: 'todo/index.html',
-            template: './pwa/todo/template.ejs',
+            template: './pwa/template.ejs',
             title: 'Туду',
         }),
         new AppManifestWebpackPlugin ({
-            logo: './pwa/todo/logo.png',
-            output: 'todo/assets/',
+            logo: './pwa/logo.png',
+            output: 'assets/',
             prefix: isProd ? '/todo/assets/' : '/assets/',
             persistentCache: false,
             config: {
