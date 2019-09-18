@@ -1,10 +1,9 @@
-const URL_PREFIX = new URL(location).searchParams.get('mode') === 'production' ? '/todo' : '';
 const URLS_TO_CACHE = [
-    '/',
-    '/app.bundle.js',
-    '/actionTypes.json',
-    '/preferencesKeys.json',
-].map((url) => `${URL_PREFIX}${url}`);
+    '/notes/',
+    '/notes/bundle.js',
+    '/notes/actionTypes.json',
+    '/notes/preferencesKeys.json',
+];
 const CACHE_NAME = 'notes';
 
 const handleInstall = async () => {
@@ -61,4 +60,4 @@ self.addEventListener('fetch', (e) => {
     e.respondWith(handleFetch(e.request));
 });
 
-importScripts(`${URL_PREFIX}/swApi.js`);
+importScripts('/notes/swApi.js');

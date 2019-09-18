@@ -2,18 +2,18 @@ const path = require('path');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const AppManifestWebpackPlugin = require('app-manifest-webpack-plugin');
+const FaviconsWebpackPlugin = require('favicons-webpack-plugin');
 const env = require('./env');
-const isProd = env.MODE === 'production';
 
 module.exports = {
     mode: env.MODE,
     entry: {
-        app: ['babel-polyfill', './pwa/index.js'],
+        notes: ['babel-polyfill', './pwa/notes/index.js'],
     },
     output: {
-        filename: '[name].bundle.js',
-        path: path.resolve('public', 'todo'),
+        filename: '[name]/bundle.js',
+        path: path.resolve('public'),
+        publicPath: '/',
     },
     module: {
         rules: [
@@ -44,23 +44,26 @@ module.exports = {
         ],
     },
     plugins: [
-        new CleanWebpackPlugin(),
+        new CleanWebpackPlugin({ cleanOnceBeforeBuildPatterns: ['**/*', '!game/**', '!favicon.ico'] }),
         new CopyWebpackPlugin([
-            './pwa/sw.js',
-            './pwa/swApi.js',
-            './pwa/actionTypes.json',
-            './pwa/preferencesKeys.json',
+            { to: 'notes', from:'./pwa/notes/sw.js' },
+            { to: 'notes', from:'./pwa/notes/swApi.js' },
+            { to: 'notes', from:'./pwa/notes/actionTypes.json' },
+            { to: 'notes', from:'./pwa/notes/preferencesKeys.json' },
         ]),
         new HtmlWebpackPlugin({
+            chunks: ['notes'],
+            filename: 'notes/index.html',
             template: './pwa/template.ejs',
             title: 'Туду',
         }),
-        new AppManifestWebpackPlugin ({
-            logo: './pwa/logo.png',
-            output: 'assets/',
-            prefix: isProd ? '/todo/assets/' : '/assets/',
-            persistentCache: false,
-            config: {
+        new FaviconsWebpackPlugin ({
+            inject: (htmlPlugin) => htmlPlugin.options.chunks[0] === 'notes',
+            logo: './pwa/notes/logo.png',
+            outputPath: '/notes/assets',
+            publicPath: '/notes',
+            prefix: 'assets/',
+            favicons: {
                 appName: 'Notes',
                 appShortName: 'Notes',
                 appDescription: 'This is a simple PWA that uses IndexedDB to save notes',
@@ -68,13 +71,14 @@ module.exports = {
                 theme_color: '#fff',
                 display: 'standalone',
                 orientation: 'portrait',
-                start_url: isProd ? '/todo/' : '/',
+                start_url: '/notes/',
                 version: '1.0.0',
-            },
+            }
         }),
     ],
     devtool: 'eval-source-map',
     devServer: {
+        // NOTE: very important to open dev-server links WITH A TRAILING SLASH   !!!
         hot: true,
     },
 };

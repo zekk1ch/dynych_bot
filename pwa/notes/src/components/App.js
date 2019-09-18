@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'react-proptypes';
 import uuid from 'uuid/v4';
 import * as actionTypes from '../../actionTypes';
 import * as preferencesKeys from '../../preferencesKeys';
@@ -31,9 +30,9 @@ class App extends React.Component {
             this.initPermissions();
 
             try {
-                await this.registerServiceWorker(this.props.mode);
+                await this.registerServiceWorker();
             } catch (err) {
-                console.error('Failed to register service worker –', err);
+                console.error('Failed to register service worker –', new Error(err));
                 setTimeout(() => {
                     alert(`Oops...\nCritical error – ${err.message}`);
                 });
@@ -47,7 +46,7 @@ class App extends React.Component {
                     isLoaded: true,
                 });
                 setTimeout(() => {
-                    if (confirm('Page needs to be reloaded for the back-end changes to take effect\\n\\nReload?')) {
+                    if (confirm('Page needs to be reloaded for the back-end changes to take effect\n\nReload?')) {
                         location.reload();
                     }
                 }, 700);
@@ -97,8 +96,7 @@ class App extends React.Component {
             throw new Error('Browser doesn\'t support service workers');
         }
 
-        const scope = this.props.mode === 'production' ? '/todo/' : '/';
-        await navigator.serviceWorker.register(`./sw.js?mode=${this.props.mode}`, { scope });
+        await navigator.serviceWorker.register('/notes/sw.js');
     };
     postDataToServiceWorker = (data) => new Promise((resolve, reject) => {
         if (!this.state.isServiceWorkerConnected) {
@@ -281,10 +279,3 @@ class App extends React.Component {
 }
 
 export default App;
-
-App.propTypes = {
-    mode: PropTypes.oneOf([
-        'development',
-        'production',
-    ]).isRequired,
-};

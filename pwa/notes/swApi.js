@@ -42,7 +42,7 @@ const createDatabase = () => new Promise((resolve, reject) => {
     };
 });
 const loadJsonFile = async (fileName) => {
-    const url = `${URL_PREFIX}/${fileName}`;
+    const url = `/notes/${fileName}`;
     const response = await fetch(url);
     if (!response.ok) {
         throw new Error(`Server responded with a "${response.status}" status when trying to fetch "${url}"`);
