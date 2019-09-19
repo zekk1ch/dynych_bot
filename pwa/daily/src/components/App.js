@@ -1,6 +1,11 @@
 import React from 'react';
+import NavBar from './NavBar/';
 
 class App extends React.Component {
+    state = {
+        currentView: 0,
+    };
+
     async componentDidMount() {
         try {
             await this.registerServiceWorker();
@@ -16,10 +21,24 @@ class App extends React.Component {
 
         await navigator.serviceWorker.register('/daily/sw.js');
     };
+    selectView = (i) => {
+        this.setState({
+            currentView: i,
+        });
+    };
+
+    get views() {
+        return ['Week', 'Day'];
+    }
 
     render() {
         return (
             <div className="app">
+                <NavBar
+                    titles={this.views}
+                    currentView={this.state.currentView}
+                    selectView={this.selectView}
+                />
             </div>
         );
     }
