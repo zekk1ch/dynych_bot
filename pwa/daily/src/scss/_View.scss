@@ -1,0 +1,20 @@
+.view-controller {
+    flex-grow: 1;
+    display: flex;
+    overflow: hidden;
+    transition: margin-left 0.4s; // FIXME: transition takes effect for window resize!
+
+    .view {
+        min-width: 100vw;
+        opacity: 0.2;
+        transition: opacity 0.3s ease 0.1s;
+
+        &:first-child {
+            margin-right: 0;
+        }
+    }
+    .view.selected {
+        opacity: 1;
+        transition: opacity 0.8s;
+    }
+}

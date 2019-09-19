@@ -1,5 +1,8 @@
 import React from 'react';
 import NavBar from './NavBar/';
+import ViewController from './views/Controller';
+import Week from './views/Week';
+import Month from './views/Month';
 
 class App extends React.Component {
     state = {
@@ -39,6 +42,10 @@ class App extends React.Component {
                     currentView={this.state.currentView}
                     selectView={this.selectView}
                 />
+                <ViewController currentView={this.state.currentView}>
+                    <Month/>
+                    <Week/>
+                </ViewController>
             </div>
         );
     }
