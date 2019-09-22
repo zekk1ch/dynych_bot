@@ -4,7 +4,7 @@ import PropTypes from 'react-proptypes';
 class Week extends React.Component {
     render() {
         return (
-            <div className="week">
+            <div className="view">
             </div>
         );
     }

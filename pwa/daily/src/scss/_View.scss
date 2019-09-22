@@ -1,10 +1,12 @@
+$slidable-transition-common: opacity 0.2s, padding 0.2s;
+
 .view-controller {
     flex-grow: 1;
     display: flex;
     overflow: hidden;
     transition: margin-left 0.4s; // FIXME: transition takes effect for window resize!
 
-    .view {
+    .view-wrapper {
         min-width: 100vw;
         opacity: 0.2;
         transition: opacity 0.3s ease 0.1s;
@@ -12,8 +14,47 @@
         &:first-child {
             margin-right: 0;
         }
+
+        .view {
+            height: 100%;
+            display: flex;
+
+            .content {
+                flex-grow: 1;
+
+                .slidable {
+                    display: inline-flex;
+                    position: relative;
+                    box-sizing: border-box;
+                    transition: $slidable-transition-common;
+
+                    .slidable-item {
+                        flex-grow: 1;
+                    }
+                }
+                .slidable:not(.is-sliding) {
+                    transition: $slidable-transition-common, padding 0.15s ease 0.05s, left 0.2s, top 0.2s;
+                }
+                .slidable.is-sliding {
+                    opacity: 0.8;
+                }
+                .slidable.x {
+                    height: 100%;
+                }
+                .slidable.y {
+                    width: 100%;
+                    flex-direction: column;
+                }
+                .slidable.x.is-sliding {
+                    padding: 3% 0;
+                }
+                .slidable.y.is-sliding {
+                    padding: 0 3%;
+                }
+            }
+        }
     }
-    .view.selected {
+    .view-wrapper.selected {
         opacity: 1;
         transition: opacity 0.8s;
     }

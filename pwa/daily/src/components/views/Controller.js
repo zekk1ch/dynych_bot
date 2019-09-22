@@ -24,7 +24,7 @@ class Controller extends React.Component {
                 {this.props.children.map((View, i) => (
                     <div
                         key={i}
-                        className={`view${this.props.currentView === i ? ' selected' : ''}`}
+                        className={`view-wrapper${this.props.currentView === i ? ' selected' : ''}`}
                         style={this.viewStyle}
                     >
                         {View}
