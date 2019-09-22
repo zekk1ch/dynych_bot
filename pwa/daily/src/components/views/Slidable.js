@@ -14,9 +14,6 @@ class Slidable extends React.Component {
     };
     handleTouchMove = (e) => {
         const { clientX, clientY } = e.touches[0];
-        let state = {
-            isSlidingX: this.state.isSlidingX,
-        };
 
         if (!this.state.isSliding) {
             const diffX = Math.abs(this.initialClientX - clientX);
@@ -25,37 +22,41 @@ class Slidable extends React.Component {
                 return;
             }
 
-            if (diffX > diffY) {
-                this.initialOffset = e.currentTarget.offsetLeft;
-                this.pointerOffset = clientX;
-                this.size = e.currentTarget.offsetWidth;
-            } else {
-                this.initialOffset = e.currentTarget.offsetTop;
-                this.pointerOffset = clientY;
-                this.size = e.currentTarget.offsetHeight;
+            const isSlidingX = diffX > diffY;
+            if (this.state.isSlidingX !== isSlidingX) {
+                return this.setState({
+                    isSlidingX,
+                });
             }
-            this.itemSize = this.size / this.children.length;
 
-            state.isSliding = true;
-            state.isSlidingX = diffX > diffY;
+            this.initialOffset = isSlidingX ? e.currentTarget.offsetLeft : e.currentTarget.offsetTop;
+            this.pointerOffset = isSlidingX ? clientX : clientY;
         }
 
-        state.offset = this.initialOffset + (state.isSlidingX ? clientX : clientY) - this.pointerOffset;
+        const size = this.state.isSlidingX ? e.currentTarget.offsetWidth : e.currentTarget.offsetHeight;
+        const itemSize = size / this.children.length;
 
-        if (state.offset >= 0) {
-            state.offset -= state.offset / 1.1;
+        let offset = this.initialOffset + (this.state.isSlidingX ? clientX : clientY) - this.pointerOffset;
+
+        const center = offset + itemSize / 2;
+        const i = Math.ceil(-1 * center / itemSize);
+        if (i >= 0 && i < this.children.length && i !== this.props.currentIndex) {
+            this.props.setIndex(i);
+        }
+
+        if (offset >= 0) {
+            offset -= offset / 1.1;
         } else {
-            const overflow = -1 * state.offset + this.itemSize - this.size;
+            const overflow = -1 * offset + itemSize - size;
             if (overflow > 0) {
-                state.offset += overflow / 1.1;
+                offset += overflow / 1.1;
             }
         }
 
-        const center = state.offset + this.itemSize / 2;
-        const i = Math.ceil(-1 * center / this.itemSize);
-        this.props.setIndex(i);
-
-        this.setState(state);
+        this.setState({
+            isSliding: true,
+            offset,
+        });
     };
     handleTouchEnd = (e) => {
         this.setState({
