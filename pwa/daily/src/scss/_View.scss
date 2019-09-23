@@ -20,7 +20,7 @@ $slidable-transition-common: opacity 0.2s, padding 0.2s;
             display: flex;
 
             .content {
-                flex-grow: 1;
+                width: 100%;
 
                 .slidable {
                     display: inline-flex;

@@ -7,6 +7,7 @@ import MonthView from './views/Month/';
 class App extends React.Component {
     state = {
         currentView: 0,
+        dates: [],
     };
 
     async componentDidMount() {
@@ -31,7 +32,7 @@ class App extends React.Component {
     };
 
     get views() {
-        return ['Week', 'Day'];
+        return ['Month', 'Week'];
     }
 
     render() {
@@ -44,6 +45,7 @@ class App extends React.Component {
                 />
                 <ViewController currentView={this.state.currentView}>
                     <MonthView
+                        dates={this.state.dates}
                     />
                     <WeekView
                     />

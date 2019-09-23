@@ -1,2 +1,9 @@
 .month {
+    height: 100%;
+    width: 100%;
+    border-spacing: unset;
+
+    .month-date {
+        height: 100%;
+    }
 }
