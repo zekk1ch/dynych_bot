@@ -43,7 +43,7 @@ $slidable-transition-common: opacity 0.2s, padding 0.2s;
                 }
                 .slidable.y {
                     width: 100%;
-                    flex-direction: column;
+                    flex-direction: column-reverse;
                 }
                 .slidable.x.is-sliding {
                     padding: 3% 0;

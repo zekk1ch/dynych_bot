@@ -38,12 +38,6 @@ class Slidable extends React.Component {
 
         let offset = this.initialOffset + (this.state.isSlidingX ? clientX : clientY) - this.pointerOffset;
 
-        const center = offset + itemSize / 2;
-        const i = Math.ceil(-1 * center / itemSize);
-        if (i >= 0 && i < this.children.length && i !== this.props.currentIndex) {
-            this.props.setIndex(i);
-        }
-
         if (offset >= 0) {
             offset -= offset / 1.1;
         } else {
@@ -51,6 +45,12 @@ class Slidable extends React.Component {
             if (overflow > 0) {
                 offset += overflow / 1.1;
             }
+        }
+
+        const center = offset + itemSize / 2;
+        const i = Math.ceil(-1 * center / itemSize);
+        if (i >= 0 && i < this.children.length && i !== this.props.currentIndex) {
+            this.props.setIndex(this.getDisplayIndex(i));
         }
 
         this.setState({
@@ -64,6 +64,9 @@ class Slidable extends React.Component {
         });
     };
 
+    getDisplayIndex = (i) => {
+        return this.state.isSlidingX ? i : (this.children.length - 1 - i);
+    };
     get children() {
         if (!Array.isArray(this.props.children)) {
             return [this.props.children];
@@ -89,7 +92,7 @@ class Slidable extends React.Component {
         let style = {};
 
         const size = `${this.children.length * 100}%`;
-        const offset = this.state.isSliding ? `${this.state.offset}px` : `${-1 * this.props.currentIndex * 100}%`;
+        const offset = this.state.isSliding ? `${this.state.offset}px` : `${-1 * this.getDisplayIndex(this.props.currentIndex) * 100}%`;
 
         if (this.state.isSlidingX) {
             style.width = size;
