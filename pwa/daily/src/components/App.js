@@ -1,5 +1,6 @@
 import React from 'react';
 import NavBar from './NavBar/';
+import Editor from './Editor/';
 import ViewController from './views/Controller';
 import WeekView from './views/Week/';
 import MonthView from './views/Month/';
@@ -8,6 +9,7 @@ class App extends React.Component {
     state = {
         currentView: 0,
         dates: [],
+        isEditorShown: false,
     };
 
     async componentDidMount() {
@@ -31,6 +33,12 @@ class App extends React.Component {
         });
     };
 
+    setIsEditorShown = (value) => {
+        this.setState({
+            isEditorShown: value,
+        });
+    };
+
     get views() {
         return ['Month', 'Week'];
     }
@@ -46,10 +54,15 @@ class App extends React.Component {
                 <ViewController currentView={this.state.currentView}>
                     <MonthView
                         dates={this.state.dates}
+                        handleDateClick={() => null}
                     />
                     <WeekView
                     />
                 </ViewController>
+                <Editor
+                    isShown={this.state.isEditorShown}
+                    setIsShown={this.setIsEditorShown}
+                />
             </div>
         );
     }

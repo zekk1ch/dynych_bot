@@ -1,23 +1,32 @@
 import React from 'react';
 import PropTypes from 'react-proptypes';
 import Slidable from '../Slidable';
+import Controls from '../Controls';
 import Month from './Month';
 
 class MonthView extends React.Component {
-    state = {
-        currentMonth: 0,
-    };
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            currentMonth: this.months.length - 1,
+        };
+    }
 
     setMonth = (i) => {
         this.setState({
             currentMonth: i,
         });
     };
+    resetMonth = () => {
+        this.setState({
+            currentMonth: this.months.length - 1,
+        });
+    };
 
     getNumOfDaysInMonth = (year, month) => {
         return new Date(year, month, 0).getDate();
     };
-
     get months() {
         let months = [];
 
@@ -57,8 +66,8 @@ class MonthView extends React.Component {
                 while (currYear < stopYear || currMonth <= stopMonth) {
                     months.push({
                         year: currYear,
-                        month: currMonth,
                         dates: Array(this.getNumOfDaysInMonth(currYear, currMonth + 1)).fill(null),
+                        month: currMonth,
                     });
 
                     if (currYear === year && currMonth === month) {
@@ -76,6 +85,18 @@ class MonthView extends React.Component {
             months[monthIndex].dates[dateObj.getDate() - 1] = data;
         });
 
+        if (!months.length) {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = today.getMonth();
+
+            months.push({
+                year,
+                month,
+                dates: Array(this.getNumOfDaysInMonth(year, month + 1)).fill(null),
+            });
+        }
+
         return months;
     }
 
@@ -83,9 +104,17 @@ class MonthView extends React.Component {
         return (
             <div className="view">
                 <div className="content">
+                    <Controls
+                        reset={this.resetMonth}
+                        isResetHidden={this.state.currentMonth === this.months.length - 1}
+                    />
                     <Slidable currentIndex={this.state.currentMonth} setIndex={this.setMonth}>
                         {this.months.map((month, i) => (
-                            <Month key={i} {...month}/>
+                            <Month
+                                key={i}
+                                handleDateClick={this.props.handleDateClick}
+                                {...month}
+                            />
                         ))}
                     </Slidable>
                 </div>
@@ -100,4 +129,5 @@ MonthView.propTypes = {
     dates: PropTypes.arrayOf(PropTypes.shape({
         id: PropTypes.number,
     })).isRequired,
+    handleDateClick: PropTypes.func.isRequired,
 };

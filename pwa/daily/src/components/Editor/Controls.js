@@ -1,16 +1,16 @@
 import React from 'react';
 import PropTypes from 'react-proptypes';
 
-class Week extends React.Component {
+class Controls extends React.Component {
     render() {
         return (
-            <div className="week">
+            <div className="controls">
             </div>
         );
     }
 }
 
-export default Week;
+export default Controls;
 
-Week.propTypes = {
+Controls.propTypes = {
 };

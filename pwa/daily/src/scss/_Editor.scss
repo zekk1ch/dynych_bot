@@ -1,0 +1,82 @@
+$editor-size: 120px;
+$editor-handle-size: 20px;
+$editor-bg-color: #eaeaea;
+$editor-dragging-bg-color: #e6e6e6;
+$editor-handle-color: #d8d8d8;
+$overlay-bg-color: rgba(190, 190, 190, 0.14);
+$overlay-dragging-bg-color: rgba(190, 190, 190, 0.20);
+$overlay-transition-common: background-color 0.4s;
+
+.editor-overlay {
+    background-color: $overlay-bg-color;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    transition: $overlay-transition-common, opacity 0.06s;
+}
+.editor-overlay.is-dragging {
+    background-color: $overlay-dragging-bg-color;
+}
+.editor-overlay.hidden {
+    height: 0;
+    opacity: 0;
+    transition: $overlay-transition-common, height 0s linear 0.2s, opacity 0.2s;
+}
+
+.editor {
+    position: fixed;
+    width: 100%;
+    height: $editor-size;
+    bottom: 0;
+    z-index: 3;
+    &:not(.is-dragging) {
+        transition: bottom 0.12s ease-out;
+    }
+
+    .editor-handle-placeholder {
+        position: relative;
+        top: 0;
+        height: $editor-handle-size;
+    }
+    .editor-handle {
+        position: relative;
+        top: -7px;
+        width: 80px;
+        height: 3px;
+        margin: 0 auto;
+        border-radius: 1.5px;
+        background-color: $editor-handle-color;
+        opacity: 0.6;
+        transition: box-shadow 0.15s, width 0.1s, opacity 0.15s;
+    }
+    .editor-handle.selected {
+        box-shadow: 0 0 1px 0.5px $editor-handle-color;
+        width: 100px;
+        opacity: 1;
+    }
+
+    .editor-content {
+        height: 100%;
+        box-shadow: 0 0 6px 2px $editor-bg-color;
+        background-color: $editor-bg-color;
+        border-radius: 10px;
+        transition: opacity 0.3s;
+    }
+}
+.editor.is-dragging {
+    .editor-content {
+        background-color: $editor-dragging-bg-color;
+        transition: none;
+    }
+}
+.editor.hidden {
+    bottom: $editor-handle-size - $editor-size;
+    &:not(.is-dragging) {
+        transition: bottom 0.3s ease-out;
+    }
+
+    .editor-content {
+        opacity: 0;
+    }
+}

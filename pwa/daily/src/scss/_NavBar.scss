@@ -8,6 +8,7 @@ $navbar-slider-dragging-bg-color: rgba(171, 171, 171, 0.42);
 $navbar-slider-transition-bg-color-speed: 0.15s;
 
 .navbar {
+    min-height: 22px;
     border-bottom: 1px solid $navbar-border-color;
     display: flex;
     position: relative;

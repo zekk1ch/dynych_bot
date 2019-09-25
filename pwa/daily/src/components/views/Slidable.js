@@ -5,7 +5,7 @@ class Slidable extends React.Component {
     state = {
         offset: 0,
         isSliding: false,
-        isSlidingX: true,
+        isSlidingX: false,
     };
 
     handleTouchStart = (e) => {
@@ -48,9 +48,10 @@ class Slidable extends React.Component {
         }
 
         const center = offset + itemSize / 2;
-        const i = Math.ceil(-1 * center / itemSize);
+        let i = Math.ceil(-1 * center / itemSize);
+        i = this.getDisplayIndex(i);
         if (i >= 0 && i < this.children.length && i !== this.props.currentIndex) {
-            this.props.setIndex(this.getDisplayIndex(i));
+            this.props.setIndex(i);
         }
 
         this.setState({
@@ -124,7 +125,7 @@ class Slidable extends React.Component {
                 onTouchEnd={this.handleTouchEnd}
             >
                 {this.children.map((node, i) => (
-                    <div key={i} className="slidable-item" style={this.itemStyle}>
+                    <div key={i} className={`slidable-item${i === this.props.currentIndex ? ' current' : ''}`} style={this.itemStyle}>
                         {node}
                     </div>
                 ))}
