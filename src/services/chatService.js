@@ -46,32 +46,32 @@ const incrementMemeUrl = async (id) => {
 };
 
 const validateFile = (file = {}) => {
+    if (!file.mediaType || !['audio', 'video'].includes(file.mediaType)) {
+        throw new Error(`Invalid file media type – "${file.mediaType}"`);
+    }
     if (!file.url || typeof file.url !== 'string') {
         throw new Error(`Invalid file URL – "${file.url}"`);
     }
-    if (!file.format || !['mp3', 'mp4'].includes(file.format)) {
-        throw new Error(`Invalid file format – "${file.format}"`);
+    if (!file.messageId || typeof file.messageId !== 'number') {
+        throw new Error(`Invalid file message ID – "${file.messageId}"`);
     }
-    if (!Array.isArray(file.parts)) {
-        throw new Error(`Invalid file parts – "${file.parts}"`);
+    if (!file.title || typeof file.title !== 'string') {
+        throw new Error(`Invalid file title – "${file.title}"`);
     }
-    file.parts.forEach((part, i, arr) => {
-        if (!part.id || typeof part.id !== 'string') {
-            throw new Error(`Invalid ID of a file part at index ${i} in "${arr}"`);
-        }
-        if (!part.title || typeof part.title !== 'string') {
-            throw new Error(`Invalid title of a file part at index ${i} in "${arr}"`);
-        }
-    });
-
+    if (!file.duration || typeof file.duration !== 'number') {
+        throw new Error(`Invalid file duration – "${file.duration}"`);
+    }
     if (file.track && typeof file.track !== 'string') {
         throw new Error(`Invalid file track name – "${file.track}"`);
     }
     if (file.artist && typeof file.artist !== 'string') {
         throw new Error(`Invalid file artist – "${file.artist}"`);
     }
-    if (file.album && typeof file.album !== 'string') {
-        throw new Error(`Invalid file album – "${file.album}"`);
+    if (file.id && typeof file.id !== 'string') {
+        throw new Error(`Invalid file ID – "${file.id}"`);
+    }
+    if (!file.id && !file.downloadUrl || file.downloadUrl && typeof file.downloadUrl !== 'string') {
+        throw new Error(`Invalid file download URL – "${file.downloadUrl}"`);
     }
 };
 
@@ -87,12 +87,12 @@ const saveFile = async (id, file) => {
     await chat.update({ files }, { where: {id} });
 };
 
-const getFileByUrl = async (id, url, format = 'mp4') => {
+const getFileByUrl = async (id, url, mediaType) => {
     const chat = await models.Chat.scope('file').findByPk(id);
     if (!chat) {
         return null;
     }
-    return chat.get('files').find((file) => file.url === url && file.format === format);
+    return chat.get('files').find((file) => file.url === url && file.mediaType === mediaType);
 };
 
 module.exports = {

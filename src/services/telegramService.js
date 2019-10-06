@@ -83,7 +83,7 @@ const sendStatus = async (chatId, status) => {
     await util.makeRequest(constants.telegramUrl + '/sendChatAction', options);
 };
 
-const sendText = async (chatId, text, replyMarkup) => {
+const sendText = (chatId, text, { replyMarkup, replyMessageId } = {}) => {
     const options = {
         method: 'POST',
         headers: {
@@ -95,9 +95,25 @@ const sendText = async (chatId, text, replyMarkup) => {
             parse_mode: 'HTML',
             disable_web_page_preview: true,
             reply_markup: replyMarkup,
+            reply_to_message_id: replyMessageId,
         }),
     };
-    await util.makeRequest(constants.telegramUrl + '/sendMessage', options);
+    return util.makeRequest(constants.telegramUrl + '/sendMessage', options);
+};
+
+const forwardMessage = async (chatId, messageId) => {
+    const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            chat_id: chatId,
+            from_chat_id: chatId,
+            message_id: messageId,
+        }),
+    };
+    await util.makeRequest(constants.telegramUrl + '/forwardMessage', options);
 };
 
 const sendReminder = async (chatId, text) => {
@@ -147,97 +163,60 @@ const saveFromYoutube = async (chatId, messageId, url) => {
             { text: 'Видео', callback_data: JSON.stringify({ t: '/video', r: messageId }) },
         ]],
     };
-    await sendText(chatId, text, replyMarkup);
+    await sendText(chatId, text, { replyMarkup });
 };
 
-const answerCallback = (callbackId) => {
-    const options = {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            callback_query_id: callbackId,
-            show_alert: false,
-        }),
-    };
-    return util.makeRequest(constants.telegramUrl + '/answerCallbackQuery', options);
-};
-
-const media = {
-    mp3: {
-        type: 'audio',
-        hookMethod: 'sendAudio',
-    },
-    mp4: {
-        type: 'video',
-        hookMethod: 'sendVideo',
-    },
-};
-const sendMedia = async (format, chatId, url, { callbackId, replyMessageId } = {}) => {
-    if (!Object.keys(media).includes(format)) {
-        throw new Error(`Unsupported media format – "${format}"`);
-    }
-    if (callbackId) {
-        await answerCallback(callbackId).catch((err) => {
-            console.error('Failed to answer callback query');
-            console.error(err);
-        });
+const sendMedia = async (mediaType, chatId, url, { replyMessageId } = {}) => {
+    const fileData = await chatService.getFileByUrl(chatId, url, mediaType);
+    if (fileData) {
+        return forwardMessage(chatId, fileData.messageId);
     }
 
-    const file = await chatService.getFileByUrl(chatId, url, format);
-    if (file) {
-        const partIds = file.parts.map((part) => part.id);
-        for (let partId of partIds) {
-            const form = new FormData();
-            form.append('chat_id', chatId);
-            form.append(media[format].type, partId);
-            if (partIds.length === 1 && replyMessageId) {
-                form.append('reply_to_message_id', replyMessageId);
-            }
+    const mediaData = await mediaService.fetchMedia(url, mediaType);
 
-            await util.makeRequest(`${constants.telegramUrl}/${media[format].hookMethod}`, { method: 'POST', body: form });
-        }
-        return;
-    }
-
-    const filePath = await mediaService.fetchVideo(url, format);
-    const parts = await mediaService.splitFile(filePath);
-
-    const fileIds = [];
-    for (let part of parts) {
-        const form = new FormData();
+    let messageId, fileId = null;
+    if (mediaData.filePath) {
+        let form = new FormData();
         form.append('chat_id', chatId);
-        form.append(media[format].type, fs.createReadStream(part.path));
-        form.append('title', part.metadata.track || part.metadata.title);
-        form.append('performer', part.metadata.artist);
-        if (parts.length === 1 && replyMessageId) {
+        if (replyMessageId) {
             form.append('reply_to_message_id', replyMessageId);
         }
+        form.append(mediaType, fs.createReadStream(mediaData.filePath));
+        form.append('title', mediaData.metadata.track || mediaData.metadata.title);
+        form.append('duration', mediaData.metadata.duration);
+        form.append('performer', mediaData.metadata.artist);
+        if (mediaType === 'video') {
+            let caption = `<a href="${url}">${mediaData.metadata.title}</a>`;
+            if (mediaData.fileUrl) {
+                caption += `\n\nКачество получше <a href="${mediaData.fileUrl}">тут</a>`;
+            }
+            form.append('parse_mode', 'HTML');
+            form.append('caption', caption);
+        }
 
-        const response = await util.makeRequest(`${constants.telegramUrl}/${media[format].hookMethod}`, { method: 'POST', body: form });
-        fileIds.push(response.result[media[format].type].file_id);
+        const response = await util.makeRequest(`${constants.telegramUrl}/send${mediaType.replace(/^./, (c) => c.toUpperCase())}`, { method: 'POST', body: form });
+        messageId = response.result.message_id;
+        fileId = response.result[mediaType].file_id;
+    } else {
+        const text = `Файл получился слишком большой ${emojiService.emojis.PERSON_SHRUGGING}\nМаксимум могу дать <a href="${mediaData.fileUrl}">ссылку</a>`;
+        const response = await sendText(chatId, text, { replyMessageId });
+        messageId = response.result.message_id;
     }
 
-    const promises = [];
-    promises.push(chatService.saveFile(chatId, {
-        url,
-        format,
-        track: parts[0].metadata.track,
-        artist: parts[0].metadata.artist,
-        album: parts[0].metadata.album,
-        parts: parts.map((part, i) => ({
-            id: fileIds[i],
-            title: part.metadata.title,
-        })),
-    }));
-    promises.push(util.deleteFile(filePath));
-    if (parts.length > 1) {
-        parts.forEach((part) => {
-            promises.push(util.deleteFile(part.path));
-        });
-    }
-    await Promise.all(promises);
+    await Promise.all([
+        chatService.saveFile(chatId, {
+            url,
+            mediaType,
+            messageId,
+            id: fileId,
+            title: mediaData.metadata.title,
+            duration: mediaData.metadata.duration,
+            track: mediaData.metadata.track,
+            artist: mediaData.metadata.artist,
+            downloadUrl: mediaData.fileUrl,
+        }).catch((err) => console.error(err)),
+        mediaData.filePath && util.deleteFile(mediaData.filePath).catch((err) => console.error(err)),
+    ]);
 };
 
 const setReminder = async (chatId) => {
@@ -291,8 +270,8 @@ module.exports = {
     createChat: wrapSendStatus(statusTypes.typing, createChat),
     randomizeMemeUrls: wrapSendStatus(statusTypes.typing, randomizeMemeUrls),
     saveFromYoutube: wrapSendStatus(statusTypes.typing, saveFromYoutube),
-    sendVideo: wrapSendStatus(statusTypes.uploadAudio, (...args) => sendMedia('mp4', ...args)),
-    sendAudio: wrapSendStatus(statusTypes.uploadAudio, (...args) => sendMedia('mp3', ...args)),
+    sendVideo: wrapSendStatus(statusTypes.uploadAudio, (...args) => sendMedia('video', ...args)),
+    sendAudio: wrapSendStatus(statusTypes.uploadAudio, (...args) => sendMedia('audio', ...args)),
     setReminder: wrapSendStatus(statusTypes.typing, setReminder),
     sendReminder: wrapSendStatus(statusTypes.typing, sendReminder),
     sendGame,

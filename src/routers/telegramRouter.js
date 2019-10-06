@@ -37,10 +37,10 @@ router.post('/', async (req, res) => {
                 await telegramService.saveFromYoutube(chatId, messageId, params);
                 break;
             case '/video':
-                await telegramService.sendVideo(chatId, params, { callbackId, replyMessageId } );
+                await telegramService.sendVideo(chatId, params, { replyMessageId });
                 break;
             case '/audio':
-                await telegramService.sendAudio(chatId, params, { callbackId, replyMessageId });
+                await telegramService.sendAudio(chatId, params, { replyMessageId });
                 break;
             case '/reminder':
                 await telegramService.setReminder(chatId);
