@@ -6,7 +6,7 @@
     "scripts": {
         "build": "webpack",
         "start": "node scripts/startServer.js",
-        "dev": "nodemon scripts/startServer.js",
+        "dev": "nodemon scripts/startServer.js --ignore src/emojis/collections",
         "dev-pwa": "webpack-dev-server",
         "dev-game": "browser-sync start --c browser-sync.config.js",
         "test": "echo \"Error: no test specified\" && exit 1"
@@ -23,27 +23,23 @@
     },
     "homepage": "https://github.com/yev-p/dynych_bot#readme",
     "dependencies": {
-        "@fortawesome/fontawesome-svg-core": "^1.2.22",
-        "@fortawesome/free-regular-svg-icons": "^5.10.2",
-        "@fortawesome/free-solid-svg-icons": "^5.10.2",
-        "@fortawesome/react-fontawesome": "^0.1.4",
+        "@fortawesome/fontawesome-svg-core": "^1.2.25",
+        "@fortawesome/free-regular-svg-icons": "^5.11.2",
+        "@fortawesome/free-solid-svg-icons": "^5.11.2",
+        "@fortawesome/react-fontawesome": "^0.1.7",
         "body-parser": "^1.19.0",
         "express": "^4.17.1",
-        "form-data": "^2.5.0",
+        "form-data": "^2.5.1",
         "node-fetch": "^2.6.0",
-        "pg": "^7.12.1",
-        "pickerjs": "^1.2.1",
-        "react": "^16.9.0",
+        "react": "^16.11.0",
         "react-proptypes": "^1.0.0",
-        "sequelize": "^5.15.1",
-        "uuid": "^3.3.3",
-        "ytdl-core": "^0.29.5"
+        "ytdl-core": "^0.29.7"
     },
     "devDependencies": {
-        "@babel/core": "^7.5.5",
-        "@babel/plugin-proposal-class-properties": "^7.5.5",
-        "@babel/preset-env": "^7.5.5",
-        "@babel/preset-react": "^7.0.0",
+        "@babel/core": "^7.7.0",
+        "@babel/plugin-proposal-class-properties": "^7.7.0",
+        "@babel/preset-env": "^7.7.1",
+        "@babel/preset-react": "^7.7.0",
         "babel-loader": "^8.0.6",
         "babel-polyfill": "^6.26.0",
         "browser-sync": "^2.26.7",
@@ -52,16 +48,13 @@
         "css-loader": "^3.2.0",
         "favicons-webpack-plugin": "^1.0.2",
         "html-webpack-plugin": "^3.2.0",
-        "node-sass": "^4.12.0",
-        "nodemon": "^1.19.1",
-        "react-dom": "^16.9.0",
+        "node-sass": "^4.13.0",
+        "nodemon": "^1.19.4",
+        "react-dom": "^16.11.0",
         "sass-loader": "^8.0.0",
         "style-loader": "^1.0.0",
-        "webpack": "^4.39.3",
-        "webpack-cli": "^3.3.7",
-        "webpack-dev-server": "^3.8.0"
-    },
-    "engines": {
-        "node": "10.x"
+        "webpack": "^4.41.2",
+        "webpack-cli": "^3.3.10",
+        "webpack-dev-server": "^3.9.0"
     }
 }

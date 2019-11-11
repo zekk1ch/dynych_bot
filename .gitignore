@@ -1,8 +1,8 @@
-/.idea
-/node_modules
-/public/notes
-/public/daily
-/temp
-!/temp/empty.txt
-/TODO.js
-/test.js
+.idea
+node_modules
+
+public/*
+src/emojis/collections/*
+
+TODO.js
+test.js

@@ -1,13 +1,13 @@
 const env = require('../env');
-const Sequelize = require('sequelize');
-global.sequelize = new Sequelize(env.DATABASE_URL);
+const constants = require('../src/constants');
+const app = require('../src/app');
 
-const app = require('../app');
-const telegramService = require('../src/services/telegramService');
-const reminderService = require('../src/services/reminderService');
+app.listen(env.PORT, function () {
+    const port = this.address().port;
 
-app.listen(env.PORT, () => {
-    console.log(`Telegram bot is listening on port ${env.PORT}`);
-
-    reminderService.setReminders(telegramService.sendReminder);
+    if (env.MODE === constants.MODE_PRODUCTION) {
+        console.log(`Server is running on port ${port}`);
+    } else {
+        console.log(`Server is running at http://localhost:${port}`);
+    }
 });

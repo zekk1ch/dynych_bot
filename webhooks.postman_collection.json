@@ -1,0 +1,96 @@
+{
+    "info": {
+        "_postman_id": "630b9d81-5275-47e8-bfbc-e09c75d67e38",
+        "name": "webhooks",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "set",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "name": "Content-Type",
+                        "value": "application/x-www-form-urlencoded",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "urlencoded",
+                    "urlencoded": [
+                        {
+                            "key": "url",
+                            "value": "https://dynych-bot.herokuapp.com",
+                            "type": "text"
+                        },
+                        {
+                            "key": "allowed_updates",
+                            "value": "message",
+                            "type": "text"
+                        },
+                        {
+                            "key": "max_connections",
+                            "value": "10",
+                            "type": "text"
+                        }
+                    ]
+                },
+                "url": {
+                    "raw": "https://api.telegram.org/bot<BOT_TOKEN>/setWebhook",
+                    "protocol": "https",
+                    "host": [
+                        "api",
+                        "telegram",
+                        "org"
+                    ],
+                    "path": [
+                        "bot<BOT_TOKEN>",
+                        "setWebhook"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "delete",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "name": "Content-Type",
+                        "value": "application/x-www-form-urlencoded",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "urlencoded",
+                    "urlencoded": [
+                        {
+                            "key": "url",
+                            "value": "https://dynych-bot.herokuapp.com",
+                            "type": "text"
+                        }
+                    ]
+                },
+                "url": {
+                    "raw": "https://api.telegram.org/bot<BOT_TOKEN>/deleteWebhook",
+                    "protocol": "https",
+                    "host": [
+                        "api",
+                        "telegram",
+                        "org"
+                    ],
+                    "path": [
+                        "bot<BOT_TOKEN>",
+                        "deleteWebhook"
+                    ]
+                }
+            },
+            "response": []
+        }
+    ],
+    "protocolProfileBehavior": {}
+}

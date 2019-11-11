@@ -45,13 +45,13 @@ module.exports = {
         ],
     },
     plugins: [
-        new CleanWebpackPlugin({ cleanOnceBeforeBuildPatterns: ['**/*', '!game/**', '!favicon.ico'] }),
+        // NOTE: to skip deletion of some static files in target folder  ==>  new CleanWebpackPlugin({ cleanOnceBeforeBuildPatterns: ['**/*', '!do_note_delete_folder/**', '!do_not_delete_file.txt'] })
+        new CleanWebpackPlugin(),
         new CopyWebpackPlugin([
             { to: 'notes', from:'./pwa/notes/sw.js' },
             { to: 'notes', from:'./pwa/notes/swApi.js' },
             { to: 'notes', from:'./pwa/notes/actionTypes.json' },
             { to: 'notes', from:'./pwa/notes/preferencesKeys.json' },
-            { to: 'daily', from:'./pwa/daily/sw.js' },
         ]),
         new HtmlWebpackPlugin({
             chunks: ['notes'],
