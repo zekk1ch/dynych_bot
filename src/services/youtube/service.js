@@ -11,6 +11,7 @@ const getDownloadUrl = async (url, audioOnly = false) => {
     return {
         fileUrl: formats[0].url,
         metadata: {
+            originalUrl: url,
             title: info.title,
             track: info.media.song,
             artist: info.media.artist,

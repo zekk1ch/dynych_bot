@@ -1,8 +1,9 @@
-const Promise = require('bluebird');
+const schedule = require('node-schedule');
+const util = require('./util');
+const emojis = require('./emojis');
 const telegramService = require('./services/telegram/service');
 const youtubeService = require('./services/youtube/service');
 const admemService = require('./services/admem/service');
-const emojis = require('./emojis');
 
 const router = async (req, res) => {
     res.end();
@@ -12,6 +13,7 @@ const router = async (req, res) => {
 
         if (options.action === 'message') {
             const hasValidYoutubeUrl = options.entities.findIndex((entity) => youtubeService.isValidUrl(entity.value)) !== -1;
+            const hasMemeCommand = options.entities.findIndex((entity) => entity.value === '/meme') !== -1;
 
             if (hasValidYoutubeUrl) {
                 const text = 'В каком формате сохранить видос?';
@@ -20,42 +22,37 @@ const router = async (req, res) => {
                     {text: 'Видео', callback_data: 'video'},
                 ]]};
                 await telegramService.sendText(options.chatId, text, { replyMarkup, replyToMessageId: options.messageId });
-            } else if (options.text === '/meme') {
-                await Promise.all([
-                    Promise.method(async () => {
-                        const imageUrl = await admemService.getRandomMemeUrl();
-                        await telegramService.sendImage(options.chatId, imageUrl);
-                    })().reflect(),
-                    Promise.resolve(telegramService.deleteMessage(options.chatId, options.messageId)).reflect(),
-                ]).then((results) => {
-                    if (results[0].isRejected()) {
-                        throw results[0].reason();
-                    }
-                });
+            } else if (hasMemeCommand) {
+                const imageUrl = await admemService.getRandomMemeUrl();
+                await telegramService.sendImage(options.chatId, imageUrl);
+
+                util.muteErrors(telegramService.deleteMessage)(options.chatId, options.messageId);
             } else {
-                await telegramService.sendText(options.chatId, emojis.getRandomEmoji(emojis.facepalmEmojis))
+                const response = await telegramService.sendText(options.chatId, emojis.getRandomEmoji(emojis.facepalmEmojis));
+
+                schedule.scheduleJob(new Date(Date.now() + 600000), util.muteErrors(telegramService.deleteMessage).bind(null, options.chatId, response.result.message_id));
             }
         }
         if (options.action === 'callback') {
             const audioOnly = options.callbackData === 'audio';
-            const telegramAction = audioOnly ? 'sendAudio' : 'sendVideo';
             const { value: youtubeUrl } = options.replyEntities.find((entity) => youtubeService.isValidUrl(entity.value));
             const { fileUrl, metadata } = await youtubeService.getDownloadUrl(youtubeUrl, audioOnly);
 
-            await Promise.all([
-                Promise.resolve(telegramService[telegramAction](options.chatId, fileUrl, metadata)).reflect(),
-                Promise.resolve(telegramService.answerCallback(options.chatId, options.callbackId)).reflect(),
-            ]).then(async (results) => {
-                if (results[0].isRejected()) {
-                    const err = results[0].reason();
-                    console.error(err);
+            try {
+                const action = audioOnly ? 'sendAudio' : 'sendVideo';
+                await telegramService[action](options.chatId, fileUrl, metadata);
 
-                    const text = err.error_code === 413
-                        ? `Файл получился слишком большой...\nВот рабочая <a href="${fileUrl}">ссылка</a> ${emojis.SHUSHING_FACE}`
-                        : `Уупс...\nЧто-то пошло не так ${emojis.THINKING_FACE}\nВот рабочая <a href="${fileUrl}">ссылка</a>`;
-                    await telegramService.sendText(options.chatId, text);
-                }
-            });
+                util.muteErrors(telegramService.deleteMessage)(options.chatId, options.messageId);
+                util.muteErrors(telegramService.deleteMessage)(options.chatId, options.replyMessageId);
+            } catch (err) {
+                console.error(err);
+                const text = err.error_code === 413
+                    ? `Файл получился слишком большой...\nВот рабочая <a href="${fileUrl}">ссылка</a> ${emojis.SHUSHING_FACE}`
+                    : `Уупс...\nЧто-то пошло не так ${emojis.THINKING_FACE}\nВот рабочая <a href="${fileUrl}">ссылка</a>`;
+                const response = await telegramService.sendText(options.chatId, text);
+
+                schedule.scheduleJob(new Date(Date.now() + 21600000), util.muteErrors(telegramService.deleteMessage).bind(null, options.chatId, response.result.message_id)); // 6 hours --> expiration time of generated YouTube links
+            }
         }
     } catch (err) {
         console.error(err);

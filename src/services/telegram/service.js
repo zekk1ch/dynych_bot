@@ -13,6 +13,8 @@ const parseRequest = (req) => {
         chatId: null,
         text: '',
         entities: [],
+        callbackData: null,
+        replyMessageId: null,
         replyEntities: [],
     };
 
@@ -29,9 +31,9 @@ const parseRequest = (req) => {
         options.action = 'callback';
         options.messageId = req.body.callback_query.message.message_id;
         options.chatId = req.body.callback_query.message.chat.id;
-        options.callbackId = req.body.callback_query.id;
         options.callbackData = req.body.callback_query.data;
         if (req.body.callback_query.message.hasOwnProperty('reply_to_message')) {
+            options.replyMessageId = req.body.callback_query.message.reply_to_message.message_id;
             if (req.body.callback_query.message.reply_to_message.hasOwnProperty('entities')) {
                 options.replyEntities = parseEntities(req.body.callback_query.message.reply_to_message.text, req.body.callback_query.message.reply_to_message.entities);
             }
@@ -41,7 +43,7 @@ const parseRequest = (req) => {
     return options;
 };
 
-const sendText = async (chatId, text, { replyMarkup, replyToMessageId } = {}) => {
+const sendText = (chatId, text, { replyMarkup, replyToMessageId } = {}) => {
     const options = {
         body: JSON.stringify({
             chat_id: chatId,
@@ -52,7 +54,7 @@ const sendText = async (chatId, text, { replyMarkup, replyToMessageId } = {}) =>
             reply_to_message_id: replyToMessageId,
         }),
     };
-    await util.makeRequest(constants.TELEGRAM_URL_SEND_MESSAGE, options);
+    return util.makeRequest(constants.TELEGRAM_URL_SEND_MESSAGE, options);
 };
 
 const sendFile = async (fileType, telegramUrl, chatId, fileUrl, metadata = {}) => {
@@ -61,48 +63,42 @@ const sendFile = async (fileType, telegramUrl, chatId, fileUrl, metadata = {}) =
     const form = new FormData();
     form.append('chat_id', chatId);
     form.append(fileType, fileStream, { filename: 'dynych_bot', knownLength: fileSize });
-    form.append('title', metadata.track || metadata.title || '');
-    form.append('duration', metadata.duration || '');
-    form.append('performer', metadata.artist || '');
+    if (fileType !== 'photo') {
+        form.append('caption', `<a href="${metadata.originalUrl}">${metadata.originalUrl}</a>`);
+        form.append('parse_mode', 'HTML');
+        form.append('title', metadata.track || metadata.title || '');
+        form.append('duration', metadata.duration || '');
+        form.append('performer', metadata.artist || '');
+    }
 
     const options = {
         headers: form.getHeaders(),
         body: form,
     };
-    await util.makeRequest(telegramUrl, options);
+    return util.makeRequest(telegramUrl, options);
 };
 const sendImage = sendFile.bind(null, 'photo', constants.TELEGRAM_URL_SEND_IMAGE);
 const sendAudio = sendFile.bind(null, 'audio', constants.TELEGRAM_URL_SEND_AUDIO);
 const sendVideo = sendFile.bind(null, 'video', constants.TELEGRAM_URL_SEND_VIDEO);
 
-const deleteMessage = async (chatId, messageId) => {
+const deleteMessage = (chatId, messageId) => {
     const options = {
         body: JSON.stringify({
             chat_id: chatId,
             message_id: messageId,
         }),
     };
-    await util.makeRequest(constants.TELEGRAM_URL_DELETE_MESSAGE, options);
+    return util.makeRequest(constants.TELEGRAM_URL_DELETE_MESSAGE, options);
 };
 
-const answerCallback = async (chatId, callbackId) => {
-    const options = {
-        body: JSON.stringify({
-            chat_id: chatId,
-            callback_query_id: callbackId,
-        }),
-    };
-    await util.makeRequest(constants.TELEGRAM_URL_ANSWER_CALLBACK, options);
-};
-
-const sendStatus = async (chatId, status) => {
+const sendStatus = (chatId, status) => {
     const options = {
         body: JSON.stringify({
             chat_id: chatId,
             action: status,
         }),
     };
-    await util.makeRequest(constants.TELEGRAM_URL_SEND_STATUS, options);
+    return util.makeRequest(constants.TELEGRAM_URL_SEND_STATUS, options);
 };
 const sendContinuousStatus = (status, fn) => async (chatId, ...args) => {
     await sendStatus(chatId, status);
@@ -122,5 +118,4 @@ module.exports = {
     sendAudio: sendContinuousStatus(constants.TELEGRAM_STATUS_IS_UPLOADING_AUDIO, sendAudio),
     sendVideo: sendContinuousStatus(constants.TELEGRAM_STATUS_IS_UPLOADING_VIDEO, sendVideo),
     deleteMessage,
-    answerCallback,
 };
