@@ -63,4 +63,16 @@ const router = async (req, res) => {
     }
 };
 
-module.exports = router;
+const keepAlive = async (req, res) => {
+    const intervalId = setInterval(() => {
+        res.write();
+    }, 25000);
+
+    try {
+        await router(req, res);
+    } finally {
+        clearInterval(intervalId);
+    }
+};
+
+module.exports = keepAlive;
