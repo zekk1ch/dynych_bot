@@ -29,6 +29,7 @@ const parseRequest = (req) => {
         options.action = 'callback';
         options.messageId = req.body.callback_query.message.message_id;
         options.chatId = req.body.callback_query.message.chat.id;
+        options.callbackId = req.body.callback_query.id;
         options.callbackData = req.body.callback_query.data;
         if (req.body.callback_query.message.hasOwnProperty('reply_to_message')) {
             if (req.body.callback_query.message.reply_to_message.hasOwnProperty('entities')) {
@@ -84,6 +85,16 @@ const deleteMessage = async (chatId, messageId) => {
     await util.makeRequest(constants.TELEGRAM_URL_DELETE_MESSAGE, options);
 };
 
+const answerCallback = async (chatId, callbackId) => {
+    const options = {
+        body: JSON.stringify({
+            chat_id: chatId,
+            callback_query_id: callbackId,
+        }),
+    };
+    await util.makeRequest(constants.TELEGRAM_URL_ANSWER_CALLBACK, options);
+};
+
 const sendStatus = async (chatId, status) => {
     const options = {
         body: JSON.stringify({
@@ -111,4 +122,5 @@ module.exports = {
     sendAudio: sendContinuousStatus(constants.TELEGRAM_STATUS_IS_UPLOADING_AUDIO, sendAudio),
     sendVideo: sendContinuousStatus(constants.TELEGRAM_STATUS_IS_UPLOADING_VIDEO, sendVideo),
     deleteMessage,
+    answerCallback,
 };

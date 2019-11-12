@@ -14,4 +14,5 @@ module.exports = {
     TELEGRAM_URL_SEND_AUDIO: `${TELEGRAM_URL}/sendAudio`,
     TELEGRAM_URL_SEND_VIDEO: `${TELEGRAM_URL}/sendVideo`,
     TELEGRAM_URL_DELETE_MESSAGE: `${TELEGRAM_URL}/deleteMessage`,
+    TELEGRAM_URL_ANSWER_CALLBACK: `${TELEGRAM_URL}/answerCallbackQuery`,
 };
