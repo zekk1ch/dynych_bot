@@ -1,4 +1,5 @@
 const env = require('../../env');
+const constants = require('../constants');
 
 const escapeBotToken = (value) => {
     switch (typeof value) {
@@ -17,17 +18,29 @@ const escapeBotToken = (value) => {
     }
 };
 
-const logRequest = (method, route, body) => console.log(`
-method: %s
-route: %s
-body: %o
-`, method, route, body);
+const logDelimiter = () => {
+    console.log();
+};
+const logMethod = (req) => {
+    console.log('method:', req.method);
+};
+const logRoute = (req) => {
+    const escaped = escapeBotToken(req.url);
+    console.log('route:', escaped);
+};
+const logBody = (req) => {
+    const escaped = escapeBotToken(req.body);
+    console.log('body: %o', escaped);
+};
 
 const request = () => (req, res, next) => {
-    const route = escapeBotToken(req.url);
-    const body = escapeBotToken(req.body);
-
-    logRequest(req.method, route, body);
+    logDelimiter();
+    logMethod(req);
+    logRoute(req);
+    if (env.MODE === constants.MODE_PRODUCTION) {
+        logBody(req);
+    }
+    logDelimiter();
 
     next();
 };
