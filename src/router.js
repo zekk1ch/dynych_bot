@@ -5,6 +5,8 @@ const admemService = require('./services/admem/service');
 const emojis = require('./emojis');
 
 const router = async (req, res) => {
+    res.end();
+
     try {
         const options = telegramService.parseRequest(req);
 
@@ -55,11 +57,8 @@ const router = async (req, res) => {
                 }
             });
         }
-
-        res.end();
     } catch (err) {
         console.error(err);
-        res.status(500).end();
     }
 };
 
