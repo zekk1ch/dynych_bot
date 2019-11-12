@@ -65,7 +65,7 @@ const router = async (req, res) => {
 
 const keepAlive = async (req, res) => {
     const intervalId = setInterval(() => {
-        res.write();
+        res.write('');
     }, 25000);
 
     try {
