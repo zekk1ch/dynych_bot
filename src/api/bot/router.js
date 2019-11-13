@@ -16,7 +16,7 @@ const router = async (req, res) => {
     try {
         switch (options.action) {
             case 'message':
-                const hasValidYoutubeUrl = options.entities.findIndex((entity) => entity.type === 'url' && youtubeService.isValidUrl(entity.value)) !== -1;
+                const hasValidYoutubeUrl = options.entities.findIndex((entity) => (entity.type === 'url' || entity.type === 'text_link') && youtubeService.isValidUrl(entity.value)) !== -1;
                 const hasMemeCommand = options.entities.findIndex((entity) => entity.type === 'bot_command' && entity.value === '/meme') !== -1;
 
                 if (hasValidYoutubeUrl) {
