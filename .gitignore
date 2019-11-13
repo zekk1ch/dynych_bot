@@ -1,9 +1,10 @@
+!**.gitkeep
+
 .idea
 node_modules
 
-public/*
 src/emojis/collections/*
-!**.gitkeep
+!src/emojis/collections/src.json
 
 TODO.js
 test.js

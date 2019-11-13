@@ -4,7 +4,7 @@
     "description": "",
     "main": "scripts/startServer.js",
     "scripts": {
-        "build": "webpack",
+        "build": "node scripts/buildEmojis.js",
         "start": "node scripts/startServer.js",
         "dev": "nodemon scripts/startServer.js --ignore src/emojis/collections",
         "dev-pwa": "webpack-dev-server",
