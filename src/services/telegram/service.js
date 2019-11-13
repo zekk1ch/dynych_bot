@@ -57,14 +57,15 @@ const sendText = (chatId, text, { replyMarkup, replyToMessageId } = {}) => {
     return util.makeRequest(constants.TELEGRAM_URL_SEND_MESSAGE, options);
 };
 
-const sendFile = async (fileType, telegramUrl, chatId, fileUrl, metadata = {}) => {
-    const { fileStream, fileSize } = await util.fetchFile(fileUrl);
-
+const sendFile = async (fileType, telegramUrl, chatId, fileData, metadata = {}) => {
     const form = new FormData();
     form.append('chat_id', chatId);
-    form.append(fileType, fileStream, { filename: 'dynych_bot', knownLength: fileSize });
+    form.append(fileType, fileData.fileStream, {
+        filename: fileData.fileName,
+        knownLength: fileData.fileSize,
+    });
     if (fileType !== 'photo') {
-        form.append('caption', `<a href="${metadata.originalUrl}">${metadata.originalUrl}</a>`);
+        form.append('caption', `<a href="${metadata.originalUrl}">${fileType === 'audio' ? metadata.originalUrl : metadata.title}</a>`);
         form.append('parse_mode', 'HTML');
         form.append('title', metadata.track || metadata.title || '');
         form.append('duration', metadata.duration || '');

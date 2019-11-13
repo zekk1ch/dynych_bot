@@ -1,36 +1,47 @@
 const constants = require('./constants');
 const util = require('./util');
-let pendingUrls = [];
+let pendingMemes = [];
 
-const fetchRandomMemeUrls = async () => {
+const fetchMemes = async () => {
     const options = {
         headers: {
             cookie: constants.ADMEM_COOKIE,
         },
     };
-    const data = await util.makeRequest(constants.ADMEM_IMAGE_URLS_URL, options);
+    const memesData = await util.makeRequest(constants.ADMEM_IMAGE_URLS_URL, options);
 
-    let memeUrls = [];
-    for (let memeData of Object.values(data)) {
+    let memes = [];
+    for (let memeData of Object.values(memesData)) {
         if ('ImgSrc' in memeData) {
-            memeUrls.push(`${constants.ADMEM_IMAGE_URL}${memeData.ImgSrc[0]}`);
+            memes.push({
+                fileUrl: `${constants.ADMEM_IMAGE_URL}${memeData.ImgSrc[0]}`,
+                fileName: memeData.ImgSrc[0],
+            });
         }
     }
 
-    return memeUrls;
+    return memes;
 };
 
-const getRandomMemeUrl = async () => {
-    if (!pendingUrls.length) {
-        pendingUrls = await fetchRandomMemeUrls();
-        if (!pendingUrls.length) {
+const getRandomDownloadFile = async () => {
+    if (!pendingMemes.length) {
+        pendingMemes = await fetchMemes();
+        if (!pendingMemes.length) {
             throw new Error('Meme server didn\'t send any fresh memes');
         }
     }
 
-    return pendingUrls.shift();
+    const { fileUrl, fileName } = pendingMemes.shift();
+    const { fileStream, fileSize } = await util.fetchFile(fileUrl);
+
+    return {
+        fileUrl,
+        fileStream,
+        fileSize,
+        fileName,
+    };
 };
 
 module.exports = {
-    getRandomMemeUrl,
+    getRandomDownloadFile,
 };

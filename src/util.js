@@ -20,16 +20,16 @@ const fetchFile = async (url) => {
     };
 };
 
-const muteErrors = (fn) => async (...args) => {
+const fireAndForget = async (fn, ...args) => {
     try {
         await fn(...args);
     } catch (err) {
-        console.error(err);
+        console.log(err);
     }
 };
 
 module.exports = {
     makeRequest,
     fetchFile,
-    muteErrors,
+    fireAndForget,
 };
