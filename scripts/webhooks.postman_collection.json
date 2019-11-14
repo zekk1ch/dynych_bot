@@ -1,10 +1,31 @@
 {
     "info": {
-        "_postman_id": "630b9d81-5275-47e8-bfbc-e09c75d67e38",
+        "_postman_id": "060fee83-5ced-41e6-8f70-97457561c410",
         "name": "webhooks",
         "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
     },
     "item": [
+        {
+            "name": "info",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "https://api.telegram.org/bot{{BOT_TOKEN}}/getWebhookInfo",
+                    "protocol": "https",
+                    "host": [
+                        "api",
+                        "telegram",
+                        "org"
+                    ],
+                    "path": [
+                        "bot{{BOT_TOKEN}}",
+                        "getWebhookInfo"
+                    ]
+                }
+            },
+            "response": []
+        },
         {
             "name": "set",
             "request": {
@@ -22,7 +43,7 @@
                     "urlencoded": [
                         {
                             "key": "url",
-                            "value": "https://dynych-bot.herokuapp.com",
+                            "value": "{{DEPLOYMENT_URL}}",
                             "type": "text"
                         },
                         {
@@ -38,7 +59,7 @@
                     ]
                 },
                 "url": {
-                    "raw": "https://api.telegram.org/bot<BOT_TOKEN>/setWebhook",
+                    "raw": "https://api.telegram.org/bot{{BOT_TOKEN}}/setWebhook",
                     "protocol": "https",
                     "host": [
                         "api",
@@ -46,7 +67,7 @@
                         "org"
                     ],
                     "path": [
-                        "bot<BOT_TOKEN>",
+                        "bot{{BOT_TOKEN}}",
                         "setWebhook"
                     ]
                 }
@@ -70,13 +91,13 @@
                     "urlencoded": [
                         {
                             "key": "url",
-                            "value": "https://dynych-bot.herokuapp.com",
+                            "value": "{{DEPLOYMENT_URL}}",
                             "type": "text"
                         }
                     ]
                 },
                 "url": {
-                    "raw": "https://api.telegram.org/bot<BOT_TOKEN>/deleteWebhook",
+                    "raw": "https://api.telegram.org/bot{{BOT_TOKEN}}/deleteWebhook",
                     "protocol": "https",
                     "host": [
                         "api",
@@ -84,7 +105,7 @@
                         "org"
                     ],
                     "path": [
-                        "bot<BOT_TOKEN>",
+                        "bot{{BOT_TOKEN}}",
                         "deleteWebhook"
                     ]
                 }
