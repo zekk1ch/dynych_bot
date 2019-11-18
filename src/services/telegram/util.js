@@ -16,6 +16,6 @@ const makeRequest = async (url, srcOptions = defaultOptions) => {
 };
 
 module.exports = {
-    ...util,
+    __proto__: util,
     makeRequest,
 };

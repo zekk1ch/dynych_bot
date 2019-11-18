@@ -3,7 +3,7 @@ const constants = require('../../constants');
 const TELEGRAM_URL = `https://api.telegram.org/bot${env.BOT_TOKEN}`;
 
 module.exports = {
-    ...constants,
+    __proto__: constants,
     TELEGRAM_STATUS_IS_TYPING: 'typing',
     TELEGRAM_STATUS_IS_UPLOADING_IMAGE: 'upload_photo',
     TELEGRAM_STATUS_IS_UPLOADING_AUDIO: 'upload_audio',

@@ -1,7 +1,7 @@
 const constants = require('../constants');
 
 module.exports = {
-    ...constants,
+    __proto__: constants,
     ANIMATED_EMOJI_NAMES: [
         'red heart',
         'thumbs up',

@@ -16,6 +16,6 @@ const getRandomArrayItem = (array) => {
 };
 
 module.exports = {
-    ...util,
+    __proto__: util,
     getRandomArrayItem,
 };

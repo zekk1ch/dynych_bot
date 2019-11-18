@@ -1,5 +1,5 @@
 const util = require('../../util');
 
 module.exports = {
-    ...util,
+    __proto__: util,
 };
